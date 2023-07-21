@@ -9,7 +9,7 @@
 </template>
 <script setup>
 import { onMounted, ref } from 'vue'
-import { initShaders, getPosByMouse } from '../utils/helper'
+import { initShaders, getMousePosInWebgl } from '../utils/helper'
 
 const mousedown = ref(false)
 const glRef = ref()
@@ -78,7 +78,7 @@ onMounted(() => {
 
   canvas.addEventListener('mousemove', function (event) {
     if (mousedown.value) {
-      const { x, y } = getPosByMouse(event, canvas)
+      const { x, y } = getMousePosInWebgl(event, canvas)
       const color = new Float32Array([Math.random(), Math.random(), Math.random(), 1.0])
       // 用类型数组代替数组，效率更高
       g_points.push({ x, y, color })

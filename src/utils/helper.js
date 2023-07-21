@@ -28,7 +28,7 @@ export function loadShader(gl, type, source) {
   return shader
 }
 
-export function getPosByMouse(event, canvas) {
+export function getMousePosInWebgl(event, canvas) {
   // 获取鼠标位置
   const { clientX, clientY } = event
   const { left, top, width, height } = canvas.getBoundingClientRect()

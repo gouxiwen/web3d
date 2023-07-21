@@ -1,12 +1,12 @@
 <template>
-  <div>画三角形（一切面都是由三角形组成）</div>
+  <div>异步绘制图形</div>
   <div class="container">
     <canvas id="canvas"></canvas>
   </div>
 </template>
 <script setup>
 import { onMounted, ref } from 'vue'
-import { initShaders, getPosByMouse } from '../utils/helper'
+import { initShaders, getMousePosInWebgl } from '../utils/helper'
 
 onMounted(() => {
   // canvas 画布
@@ -15,7 +15,7 @@ onMounted(() => {
   canvas.height = document.querySelector('.container').clientHeight
   // webgl画笔
   const gl = canvas.getContext('webgl')
-  gl.clearColor(0, 0, 0, 0)
+  gl.clearColor(0, 0, 0, 1)
   // 顶点着色器
   // 用attribute定义顶点变量
   const vsSource = `
@@ -48,7 +48,6 @@ onMounted(() => {
   //赋能-批处理
   gl.enableVertexAttribArray(a_Position)
 
-  gl.clearColor(0.0, 0.0, 0.0, 1.0)
   gl.clear(gl.COLOR_BUFFER_BIT)
   gl.drawArrays(gl.POINTS, 0, 1)
   // 异步绘制
@@ -68,8 +67,5 @@ onMounted(() => {
 <style scoped>
 .container {
   height: calc(100vh - 18px);
-  background: url('../assets/images/sky.jpg');
-  background-size: cover;
-  background-position: right bottom;
 }
 </style>

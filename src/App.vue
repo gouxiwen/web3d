@@ -8,7 +8,13 @@ import { RouterLink, RouterView } from 'vue-router'
       <RouterLink to="/">Base</RouterLink>
       <RouterLink to="/sky">Sky</RouterLink>
       <RouterLink to="/triangle">Triangle</RouterLink>
-      <RouterLink to="/async-draw">异步绘制</RouterLink>
+      <RouterLink to="/async-draw-base">异步绘制-基础</RouterLink>
+      <RouterLink to="/async-draw-1">异步绘制-应用1</RouterLink>
+      <RouterLink to="/async-draw-2">异步绘制-应用2</RouterLink>
+      <RouterLink to="/async-draw-3">异步绘制-应用3</RouterLink>
+      <RouterLink to="/async-draw-4">异步绘制-应用4</RouterLink>
+      <RouterLink to="/transform">变换</RouterLink>
+      <RouterLink to="/matrix-transform">矩阵变换</RouterLink>
     </nav>
   </header>
   <RouterView />

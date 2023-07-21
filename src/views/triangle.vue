@@ -6,7 +6,7 @@
 </template>
 <script setup>
 import { onMounted, ref } from 'vue'
-import { initShaders, getPosByMouse } from '../utils/helper'
+import { initShaders, getMousePosInWebgl } from '../utils/helper'
 
 onMounted(() => {
   // canvas 画布
