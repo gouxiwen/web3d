@@ -10,6 +10,14 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { initShaders, getMousePosInWebgl } from '../utils/helper'
+// webgl可绘制类型type，gl.drawArrays(type,...)
+// POINTS 可视的点
+// LINES 单独线段
+// LINE_STRIP 线条
+// LINE_LOOP 闭合线条
+// TRIANGLES 单独三角形
+// TRIANGLE_STRIP 三角带
+// TRIANGLE_FAN 三角扇
 
 const mousedown = ref(false)
 const glRef = ref()

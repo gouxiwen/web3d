@@ -15,6 +15,13 @@ import { RouterLink, RouterView } from 'vue-router'
       <RouterLink to="/async-draw-4">异步绘制-应用4</RouterLink>
       <RouterLink to="/transform">变换</RouterLink>
       <RouterLink to="/matrix-transform">矩阵变换</RouterLink>
+      <RouterLink to="/matrix-multiply-transform">复合变换</RouterLink>
+      <RouterLink to="/matrix-views">视图矩阵</RouterLink>
+      <RouterLink to="/matrix-views-wave">视图矩阵-波浪</RouterLink>
+      <RouterLink to="/color-multiply">颜色-多点异色</RouterLink>
+      <RouterLink to="/color-wave">颜色-波浪异色</RouterLink>
+      <RouterLink to="/texture">纹理</RouterLink>
+      <RouterLink to="/texture-multiply">多纹理</RouterLink>
     </nav>
   </header>
   <RouterView />

@@ -6,7 +6,7 @@
 </template>
 <script setup>
 import { onMounted } from 'vue'
-import { initShaders } from '../utils/helper'
+import { initShaders, ScaleLinear } from '../utils/helper'
 
 // 路径G顶点数据
 const pathData = [
@@ -36,18 +36,6 @@ onMounted(() => {
   //建立比例尺
   const scaleX = ScaleLinear(0, minX, 600, maxX)
   const scaleY = ScaleLinear(0, maxY, 600, minY)
-  //线性比例尺
-  function ScaleLinear(ax, ay, bx, by) {
-    const delta = {
-      x: bx - ax,
-      y: by - ay
-    }
-    const k = delta.y / delta.x
-    const b = ay - ax * k
-    return function (x) {
-      return k * x + b
-    }
-  }
   // 将路径G中的像素数据解析为webgl数据
   const glData = []
   for (let i = 0; i < pathData.length; i += 2) {

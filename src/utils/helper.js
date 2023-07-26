@@ -38,3 +38,23 @@ export function getMousePosInWebgl(event, canvas) {
   const yBaseCenterTop = -yBaseCenter
   return { x: xBaseCenter / halfWidth, y: yBaseCenterTop / halfHeight }
 }
+
+//线性比例尺
+export function ScaleLinear(ax, ay, bx, by) {
+  const delta = {
+    x: bx - ax,
+    y: by - ay
+  }
+  const k = delta.y / delta.x
+  const b = ay - ax * k
+  return function (x) {
+    return k * x + b
+  }
+}
+
+// 正弦函数
+export function SinFn(a, Omega, phi) {
+  return function (x) {
+    return a * Math.sin(Omega * x + phi)
+  }
+}

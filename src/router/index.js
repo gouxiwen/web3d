@@ -52,6 +52,41 @@ const router = createRouter({
       path: '/matrix-transform',
       name: 'matrix-transform',
       component: () => import('../views/matrix-transform.vue')
+    },
+    {
+      path: '/matrix-multiply-transform',
+      name: 'matrix-multiply-transform',
+      component: () => import('../views/matrix-multiply-transform.vue')
+    },
+    {
+      path: '/matrix-views',
+      name: 'matrix-views',
+      component: () => import('../views/matrix-views.vue')
+    },
+    {
+      path: '/matrix-views-wave',
+      name: 'matrix-views-wave',
+      component: () => import('../views/matrix-views-wave.vue')
+    },
+    {
+      path: '/color-multiply',
+      name: 'color-multiply',
+      component: () => import('../views/color-multiply.vue')
+    },
+    {
+      path: '/color-wave',
+      name: 'color-wave',
+      component: () => import('../views/color-wave.vue')
+    },
+    {
+      path: '/texture',
+      name: 'texture',
+      component: () => import('../views/texture.vue')
+    },
+    {
+      path: '/texture-multiply',
+      name: 'texture-multiply',
+      component: () => import('../views/texture-multiply.vue')
     }
   ]
 })

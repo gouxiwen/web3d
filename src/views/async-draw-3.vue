@@ -23,7 +23,7 @@ onMounted(() => {
   gl.clear(gl.COLOR_BUFFER_BIT)
   // 顶点着色器
   // 用attribute定义顶点变量
-  // varying变量可以传递给片元着色器
+  // varying变量是全局变量，可以传递给片元着色器
   const vsSource = `
       attribute vec4 a_Attr;
       varying float v_Alpha;

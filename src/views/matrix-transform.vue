@@ -21,7 +21,7 @@ import { Matrix4 } from 'https://unpkg.com/three/build/three.module.js'
 // 矩阵可以认为是由多维向量构成的集合，矩阵乘向量就是矩阵里的向量分别乘向量
 
 // 行主序和列主序：
-// 矩阵按照向量的横竖方向又分为行主序和列主序，其中webgl是烈主序，数学中是行主序
+// 矩阵按照向量的横竖方向又分为行主序和列主序，其中webgl是列主序，数学中是行主序
 
 // 由上可以知道，webgl中想要通过矩阵旋转一个点，可以在顶点着色器中定义一个行主序矩阵，然后和该点相乘
 // 如：
@@ -91,6 +91,7 @@ onMounted(() => {
   !(function ani() {
     angle += 0.02
     const [sinB, cosB] = [Math.sin(angle), Math.cos(angle)]
+    // 以下均为列矩阵
     // 二维矩阵-z轴旋转
     // const matrix = [cosB, sinB, -sinB, cosB]
     // gl.uniformMatrix2fv(u_Matrix, false, matrix)
