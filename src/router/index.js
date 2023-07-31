@@ -87,6 +87,36 @@ const router = createRouter({
       path: '/texture-multiply',
       name: 'texture-multiply',
       component: () => import('../views/texture-multiply.vue')
+    },
+    {
+      path: '/texture-module',
+      name: 'texture-module',
+      component: () => import('../views/texture-module.vue')
+    },
+    {
+      path: '/texture-mix',
+      name: 'texture-mix',
+      component: () => import('../views/texture-mix.vue')
+    },
+    {
+      path: '/texture-video',
+      name: 'texture-video',
+      component: () => import('../views/texture-video.vue')
+    },
+    {
+      path: '/glsl-1',
+      name: 'glsl-1',
+      component: () => import('../views/glsl-1.vue')
+    },
+    {
+      path: '/glsl-2',
+      name: 'glsl-2',
+      component: () => import('../views/glsl-2.vue')
+    },
+    {
+      path: '/glsl-3',
+      name: 'glsl-3',
+      component: () => import('../views/glsl-3.vue')
     }
   ]
 })

@@ -1,5 +1,5 @@
 <template>
-  <div>多纹理</div>
+  <div>多面纹理</div>
   <div class="container">
     <canvas id="canvas"></canvas>
   </div>
@@ -101,11 +101,11 @@ onMounted(() => {
   gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1)
 
   /* 准备三个角色 */
-  gl.activeTexture(gl.TEXTURE0)
-  const texture = gl.createTexture()
+  gl.activeTexture(gl.TEXTURE0) // 纹理单元
+  const texture = gl.createTexture() // 纹理对象
   gl.bindTexture(gl.TEXTURE_2D, texture)
 
-  const image = new Image()
+  const image = new Image() // 纹理图像
   image.src = img
   image.onload = function () {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)

@@ -40,7 +40,7 @@ onMounted(() => {
         if(dist < 0.5) {
             gl_FragColor = u_FragColor;
         } else {
-            discard; 
+            discard;
         }
     }
   `

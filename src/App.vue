@@ -21,7 +21,13 @@ import { RouterLink, RouterView } from 'vue-router'
       <RouterLink to="/color-multiply">颜色-多点异色</RouterLink>
       <RouterLink to="/color-wave">颜色-波浪异色</RouterLink>
       <RouterLink to="/texture">纹理</RouterLink>
-      <RouterLink to="/texture-multiply">多纹理</RouterLink>
+      <RouterLink to="/texture-multiply">多面纹理</RouterLink>
+      <RouterLink to="/texture-module">纹理-模块化实现</RouterLink>
+      <RouterLink to="/texture-mix">纹理-图层混合</RouterLink>
+      <RouterLink to="/texture-video">纹理-视频贴图</RouterLink>
+      <RouterLink to="/glsl-1">glsl语言实战-渐变</RouterLink>
+      <RouterLink to="/glsl-2">glsl语言实战-杂色</RouterLink>
+      <RouterLink to="/glsl-3">glsl语言实战-金属色</RouterLink>
     </nav>
   </header>
   <RouterView />
