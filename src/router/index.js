@@ -117,6 +117,41 @@ const router = createRouter({
       path: '/glsl-3',
       name: 'glsl-3',
       component: () => import('../views/glsl-3.vue')
+    },
+    {
+      path: '/three-world1',
+      name: 'three-world1',
+      component: () => import('../views/three-world1.vue')
+    },
+    {
+      path: '/three-world2',
+      name: 'three-world2',
+      component: () => import('../views/three-world2.vue')
+    },
+    {
+      path: '/three-world3',
+      name: 'three-world3',
+      component: () => import('../views/three-world3.vue')
+    },
+    {
+      path: '/multiply-shader',
+      name: 'multiply-shader',
+      component: () => import('../views/multiply-shader.vue')
+    },
+    {
+      path: '/my-three-test',
+      name: 'my-three-test',
+      component: () => import('../views/my-three-test.vue')
+    },
+    {
+      path: '/three-world4',
+      name: 'three-world4',
+      component: () => import('../views/three-world4.vue')
+    },
+    {
+      path: '/three-world5',
+      name: 'three-world5',
+      component: () => import('../views/three-world5.vue')
     }
   ]
 })

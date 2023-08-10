@@ -28,6 +28,13 @@ import { RouterLink, RouterView } from 'vue-router'
       <RouterLink to="/glsl-1">glsl语言实战-渐变</RouterLink>
       <RouterLink to="/glsl-2">glsl语言实战-杂色</RouterLink>
       <RouterLink to="/glsl-3">glsl语言实战-金属色</RouterLink>
+      <RouterLink to="/three-world1">三维世界-正交相机</RouterLink>
+      <RouterLink to="/three-world2">三维世界-透视相机</RouterLink>
+      <RouterLink to="/three-world3">三维世界-顶点索引</RouterLink>
+      <RouterLink to="/multiply-shader">多着色器</RouterLink>
+      <RouterLink to="/my-three-test">封装webgl框架</RouterLink>
+      <RouterLink to="/three-world4">三维世界-鼠标选择立方体</RouterLink>
+      <RouterLink to="/three-world5">三维世界-别墅室内布局</RouterLink>
     </nav>
   </header>
   <RouterView />

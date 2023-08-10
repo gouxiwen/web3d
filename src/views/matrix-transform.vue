@@ -96,33 +96,14 @@ onMounted(() => {
     // const matrix = [cosB, sinB, -sinB, cosB]
     // gl.uniformMatrix2fv(u_Matrix, false, matrix)
     // 四维矩阵-z轴旋转
+    // const matrix = [
     // cosB, sinB, 0.0, 0.0,
     // -sinB, cosB, 0.0, 0.0,
     // 0.0, 0.0, 1.0, 0.0,
     // 0.0, 0.0, 0.0, 1.0
-    // const matrix = [
-    //   cosB,
-    //   sinB,
-    //   0.0,
-    //   0.0,
-    //   -sinB,
-    //   cosB,
-    //   0.0,
-    //   0.0,
-    //   0.0,
-    //   0.0,
-    //   1.0,
-    //   0.0,
-    //   0.0,
-    //   0.0,
-    //   0.0,
-    //   1.0
     // ]
+
     // 四维矩阵-平移
-    // 1.0, 0.0, 0.0,0.0,
-    // 0.0, 1.0, 0.0,0.0,
-    // 0.0, 0.0, 1.0,0.0,
-    // x,   y,   z,  1.0
     // x += 0.01
     // if (x > 1) {
     //   x = -1
@@ -135,31 +116,21 @@ onMounted(() => {
     // if (z > 1) {
     //   z = -1
     // }
-    // const matrix = [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, x, y, z, 1.0]
+    // const matrix = [
+    // 1.0, 0.0, 0.0,0.0,
+    // 0.0, 1.0, 0.0,0.0,
+    // 0.0, 0.0, 1.0,0.0,
+    // x,   y,   z,  1.0
+    // ]
+
     // 四维矩阵-缩放
+    // scalex = Math.sin(angle) + 1
+    // scaley = Math.sin(angle) + 1
+    // const matrix = [
     // scalex, 0.0, 0.0,0.0,
     // 0.0, scaley, 0.0,0.0,
     // 0.0, 0.0, scalez,0.0,
     // 0.0, 0.0, 0.0,1.0
-    // scalex = Math.sin(angle) + 1
-    // scaley = Math.sin(angle) + 1
-    // const matrix = [
-    //   scalex,
-    //   0.0,
-    //   0.0,
-    //   0.0,
-    //   0.0,
-    //   scaley,
-    //   0.0,
-    //   0.0,
-    //   0.0,
-    //   0.0,
-    //   scalez,
-    //   0.0,
-    //   0.0,
-    //   0.0,
-    //   0.0,
-    //   1.0
     // ]
     // 使用矩阵库
     matrix4.makeRotationZ(angle)

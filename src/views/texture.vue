@@ -96,7 +96,7 @@ onMounted(() => {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
     // 非二次幂图像源的显示
     // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE) // s方向，等于u方向
-    // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE) // t方向，等于t方向
+    // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE) // t方向，等于v方向
     //获取u_Sampler
     const u_Sampler = gl.getUniformLocation(gl.program, 'u_Sampler')
     //将0号纹理分配给着色器，0 是纹理单元编号
