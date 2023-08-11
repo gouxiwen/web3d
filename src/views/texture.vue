@@ -10,6 +10,11 @@ import { initShaders, getMousePosInWebgl } from '../utils/helper'
 // import img from '../assets/images/sky.jpg' // 非二次幂图像
 import img from '../assets/images/erha.jpg'
 
+// 使用图钉选择图形的位置
+// uv坐标系，也叫st坐标系。
+// uv坐标系的坐标原点在图像的左下角，u轴在右，v轴在上。
+// u轴上的1个单位是图像的宽；
+// v轴上的1个单位是图像的高。
 onMounted(() => {
   // canvas 画布
   const canvas = document.getElementById('canvas')

@@ -35,6 +35,7 @@ import { RouterLink, RouterView } from 'vue-router'
       <RouterLink to="/my-three-test">封装webgl框架</RouterLink>
       <RouterLink to="/three-world4">三维世界-鼠标选择立方体</RouterLink>
       <RouterLink to="/three-world5">三维世界-别墅室内布局</RouterLink>
+      <RouterLink to="/light1">光-反射</RouterLink>
     </nav>
   </header>
   <RouterView />

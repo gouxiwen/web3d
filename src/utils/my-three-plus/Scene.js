@@ -87,6 +87,7 @@ export default class Scene {
     gl.drawArrays(gl[mode], 0, count)
   }
   drawElements(gl, count, mode) {
-    gl.drawElements(gl[mode], count, gl.UNSIGNED_BYTE, 0)
+    // gl.drawElements(gl[mode], count, gl.UNSIGNED_BYTE, 0) // 只能支持Uint8Array
+    gl.drawElements(gl[mode], count, gl.UNSIGNED_SHORT, 0)
   }
 }

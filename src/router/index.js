@@ -152,6 +152,11 @@ const router = createRouter({
       path: '/three-world5',
       name: 'three-world5',
       component: () => import('../views/three-world5.vue')
+    },
+    {
+      path: '/light1',
+      name: 'light1',
+      component: () => import('../views/light1.vue')
     }
   ]
 })
