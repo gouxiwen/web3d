@@ -1,5 +1,5 @@
 <template>
-  <div>光-反射</div>
+  <div>光-纹理映射</div>
   <div class="container">
     <canvas id="canvas"></canvas>
   </div>
@@ -19,43 +19,6 @@ import {
 } from 'https://unpkg.com/three/build/three.module.js'
 import OrbitControls from '../utils/OrbitControls.js'
 import { Geo, Mat, Obj3D, Scene } from '../utils/my-three-plus'
-
-// Blinn-Phone 漫反射的计算公式：
-// Ld=kd(I/r²)*max(0,n·l)
-
-// Ld-diffusely reflected light 漫反射
-// kd-diffuse coefficient 漫反射系数，即颜色
-// I/r²-着色点处的光线强度
-// 入射光线l和着色点法线n，都是单位向量，所以n·l就是cos∠<n,l>，可以表示接收光线数量
-// max(0,n·l)-着色点接收到的光线数量
-
-// Blinn-Phone 计算镜面反射的公式如下：
-// h=(v+l)/|v+l|
-// Ls=ks*(I/r²)*pow(max(0,n·h),p)
-
-// h：∠<v,v+l> 的角平分线
-// |v+l|：(v+l) 的长度
-// Ls：镜面反射 specularly reflected light
-// ks：镜面反射系数 specularly coefficient
-// max(0,n·h)：cos∠<h,n>
-// pow(max(0,n·h),p)：cos∠<h,n>的p次方
-
-// 解释一下cos∠<h,n>的p次方的意义。
-// 若只用cos∠<h,n> 来计算高光，会得到较大的高光，而我们平时所见的高光一般都是比较小的。
-// 因此，我们可以对cos∠<h,n>做一下幂运算。
-
-// Blinn-Phone 计算环境反射的公式如下：
-// La=ka*Ia
-
-// La：环境反射 reflected ambient light
-// ka：环境光系数 ambient coefficient
-// Ia：环境光强度 ambient intensity
-
-// Blinn-Phong 反射模型:
-// 综上，将环境光Ambient、漫反射Diffuse 和高光Specular 加在一起的方法，就叫Blinn-Phong 反射模型，即：
-// L=La+Ld+Ls
-// L=ka*Ia+kd(I/r²)*max(0,n·l)+ks*(I/r²)*pow(max(0,n·h),p)
-
 // 顶点着色器
 const vsSource = `
     attribute vec4 a_Position;
