@@ -19,49 +19,32 @@ import {
 } from 'https://unpkg.com/three/build/three.module.js'
 import OrbitControls from '../utils/OrbitControls.js'
 import { Geo, Mat, Obj3D, Scene } from '../utils/my-three-plus'
+import Geography from '../utils/Geography.js'
+import Earth from '../utils/Earth.js'
+import Rect from '../utils/Rect.js'
+import earthImg from '../assets/images/earth.jpg'
+import markImg from '../assets/images/mark.png'
+
 // 顶点着色器
 const vsSource = `
-    attribute vec4 a_Position;
-    attribute vec3 a_Normal;
-    uniform mat4 u_ModelMatrix;
-    uniform mat4 u_PvMatrix;
-    varying vec3 v_Normal;
-    varying vec3 v_Position;
-    void main(){
-      gl_Position = u_PvMatrix*u_ModelMatrix*a_Position;
-      v_Normal=a_Normal;
-      v_Position=vec3(a_Position);
-    }
+  attribute vec4 a_Position;
+  attribute vec2 a_Pin;
+  uniform mat4 u_PvMatrix;
+  uniform mat4 u_ModelMatrix;
+  varying vec2 v_Pin;
+  void main(){
+    gl_Position=u_PvMatrix*u_ModelMatrix*a_Position;
+    v_Pin=a_Pin;
+  }
   `
 // 片元着色器
 const fsSource = `
-    precision mediump float;
-    uniform vec3 u_Kd;
-    uniform vec3 u_Ks;
-    uniform vec3 u_Ka;
-    uniform vec3 u_LightDir;
-    uniform vec3 u_Eye;
-    varying vec3 v_Normal;
-    varying vec3 v_Position;
-
-    void main(){
-      //眼睛看向当前着色点的视线
-      vec3 eyeDir=normalize(u_Eye-v_Position);
-      //视线与光线之和
-      vec3 el=eyeDir+u_LightDir;
-      //视线与光线的角平分线
-      vec3 h=el/length(el);
-      //漫反射
-      vec3 diffuse=u_Kd*max(0.0,dot(v_Normal,u_LightDir));
-      //反射
-      vec3 specular=u_Ks*pow(
-        max(0.0,dot(v_Normal,h)),
-        64.0
-      );
-      //Blinn-Phong反射
-      vec3 l=diffuse+specular+u_Ka;
-      gl_FragColor=vec4(l,1.0);
-    }
+  precision mediump float;
+  uniform sampler2D u_Sampler;
+  varying vec2 v_Pin;
+  void main(){
+    gl_FragColor=texture2D(u_Sampler,v_Pin);
+  }
   `
 
 let gl, camera, scene, orbit
@@ -79,45 +62,40 @@ const init = () => {
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
     gl.enable(gl.DEPTH_TEST) // 深度测试可以解决物体的遮挡问题，不然后面的物体可能挡住前面的物体。
 
+    // 球体
+    const earth = new Earth(0.5, 64, 32)
+
+    // 矩形面-标记点
+    const rect = new Rect(0.02, 0.02, 0.5, 0)
+
     // 目标点
     const target = new Vector3()
+    const rad = Math.PI / 180
+    const geography = new Geography(earth.r, 116.404 * rad, 39.915 * rad)
+    const modelMatrix = new Matrix4().setPosition(geography.position)
     //视点
-    const eye = new Vector3(0.5, 1, 1)
-    const [fov, aspect, near, far] = [45, canvas.width / canvas.height, 1, 20]
+    // const eye = new Vector3(2, 0, 0)
+    // 让相机的视点直视标记点。
+    const eye = geography.clone().setR(earth.r + 1).position
+    const [fov, aspect, near, far] = [45, canvas.width / canvas.height, 0.1, 5]
     // 透视相机
     camera = new PerspectiveCamera(fov, aspect, near, far)
     camera.position.copy(eye)
     // 轨道控制器
     orbit = new OrbitControls({ camera, target, dom: canvas })
 
-    // 阳光的光线方向
-    const LightDir = new Vector3(0.5, 1, 1).normalize()
-    // 漫反射系数-颜色
-    const u_Kd = [0.7, 0.7, 0.7]
-    // 镜面反射系数-颜色
-    const u_Ks = [0.3, 0.3, 0.3]
-    // 环境光系数-颜色
-    const u_Ka = [0.2, 0.2, 0.2]
-    // 球体
-    const sphere = new SphereGeometry(0.5, 24, 24)
-    // 借助threejs的球体对象拿到顶点、法线、顶点索引
-    // 顶点集合
-    const { array: vertices } = sphere.getAttribute('position')
-    // 法线集合
-    const { array: normals } = sphere.getAttribute('normal')
-    // 顶点索引集合
-    const { array: indexes } = sphere.index
     // 场景
     scene = new Scene({ gl })
-    // 注册程序对象
-    scene.registerProgram('Blinn-Phong', {
+    //注册程序对象
+    scene.registerProgram('map', {
       program: createProgram(gl, vsSource, fsSource),
-      attributeNames: ['a_Position', 'a_Normal'],
-      uniformNames: ['u_PvMatrix', 'u_ModelMatrix', 'u_Kd', 'u_LightDir', 'u_Ks', 'u_Eye', 'u_Ka']
+      attributeNames: ['a_Position', 'a_Pin'],
+      uniformNames: ['u_PvMatrix', 'u_ModelMatrix', 'u_Sampler']
     })
 
-    const mat = new Mat({
-      program: 'Blinn-Phong',
+    //地球
+    const matEarth = new Mat({
+      program: 'map',
       data: {
         u_PvMatrix: {
           value: orbit.getPvMatrix().elements,
@@ -126,47 +104,81 @@ const init = () => {
         u_ModelMatrix: {
           value: new Matrix4().elements,
           type: 'uniformMatrix4fv'
-        },
-        u_LightDir: {
-          value: Object.values(LightDir),
-          type: 'uniform3fv'
-        },
-        u_Kd: {
-          value: u_Kd,
-          type: 'uniform3fv'
-        },
-        u_Ks: {
-          value: u_Ks,
-          type: 'uniform3fv'
-        },
-        u_Ka: {
-          value: u_Ka,
-          type: 'uniform3fv'
-        },
-        u_Eye: {
-          value: Object.values(camera.position),
-          type: 'uniform3fv'
         }
       }
     })
-    const geo = new Geo({
+    const geoEarth = new Geo({
       data: {
         a_Position: {
-          array: vertices,
+          array: earth.vertices,
           size: 3
         },
-        a_Normal: {
-          array: normals,
-          size: 3
+        a_Pin: {
+          array: earth.uv,
+          size: 2
         }
       },
       index: {
-        array: indexes
+        array: earth.indexes
       }
     })
-    const obj = new Obj3D({ geo, mat })
-    scene.add(obj)
-    render()
+
+    // 标记点
+    const matMark = new Mat({
+      program: 'map',
+      data: {
+        u_PvMatrix: {
+          value: orbit.getPvMatrix().elements,
+          type: 'uniformMatrix4fv'
+        },
+        u_ModelMatrix: {
+          value: modelMatrix.elements,
+          type: 'uniformMatrix4fv'
+        }
+      }
+    })
+    const geoMark = new Geo({
+      data: {
+        a_Position: {
+          array: rect.vertices,
+          size: 3
+        },
+        a_Pin: {
+          array: rect.uv,
+          size: 2
+        }
+      },
+      index: {
+        array: rect.indexes
+      }
+    })
+
+    //加载图片
+    const promises = [earthImg, markImg].map((ele) => {
+      const image = new Image()
+      image.src = ele
+      return imgPromise(image)
+    })
+    Promise.all(promises).then((imgs) => {
+      matEarth.maps.u_Sampler = { image: imgs[0] }
+      matMark.maps.u_Sampler = {
+        image: imgs[1],
+        format: gl.RGBA
+      }
+      scene.add(
+        new Obj3D({
+          geo: geoEarth,
+          mat: matEarth
+        })
+      )
+      scene.add(
+        new Obj3D({
+          geo: geoMark,
+          mat: matMark
+        })
+      )
+      render()
+    })
 
     bindEvent(canvas)
   }
@@ -195,18 +207,9 @@ const bindEvent = (canvas) => {
   })
 }
 
-function updateOrbit() {
-  scene.setUniform('u_PvMatrix', {
-    value: orbit.getPvMatrix().elements
-  })
-}
-
+// 连续渲染
 function render() {
-  updateOrbit()
   orbit.getPvMatrix()
-  scene.setUniform('u_Eye', {
-    value: Object.values(camera.position)
-  })
   scene.draw()
   requestAnimationFrame(render)
 }

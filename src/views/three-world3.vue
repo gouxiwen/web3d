@@ -122,8 +122,7 @@ onMounted(() => {
   const orbit = new OrbitControls({
     camera,
     target,
-    dom: canvas,
-    render
+    dom: canvas
   })
   /* 取消右击菜单的显示 */
   canvas.addEventListener('contextmenu', (event) => {

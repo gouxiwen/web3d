@@ -64,7 +64,6 @@ export default class OrbitControls {
     } = this
     let scale = deltaY < 0 ? zoomScale : 1 / zoomScale
     this[`dolly${type}`](scale)
-    this.render?.()
   }
   dollyPerspectiveCamera(dollyScale) {
     this.spherical.radius *= dollyScale
@@ -115,7 +114,6 @@ export default class OrbitControls {
     panOffset.copy(vx.add(vy))
 
     this.updatePos()
-    this.render?.()
   }
 
   panOrthographicCamera({ x, y }) {
@@ -143,7 +141,6 @@ export default class OrbitControls {
     vy.multiplyScalar(distanceUp)
     panOffset.copy(vx.add(vy))
     this.updatePos()
-    this.render?.()
   }
 
   rotate({ x, y }) {
@@ -162,7 +159,6 @@ export default class OrbitControls {
       spherical.phi = Math.min(Math.PI * 0.99999999, Math.max(0.00000001, phi))
     }
     this.updateSph()
-    this.render?.()
   }
 
   // update() {

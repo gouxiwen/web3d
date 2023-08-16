@@ -157,6 +157,11 @@ const router = createRouter({
       path: '/light1',
       name: 'light1',
       component: () => import('../views/light1.vue')
+    },
+    {
+      path: '/light2',
+      name: 'light2',
+      component: () => import('../views/light2.vue')
     }
   ]
 })

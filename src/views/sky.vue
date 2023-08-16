@@ -9,7 +9,6 @@ import { onMounted, ref } from 'vue'
 import { initShaders, getMousePosInWebgl } from '../utils/helper'
 import Compose from '../utils/Compose'
 import Track from '../utils/Track'
-
 onMounted(() => {
   // canvas 画布
   const canvas = document.getElementById('canvas')
