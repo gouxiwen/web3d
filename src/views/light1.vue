@@ -16,7 +16,7 @@ import {
   PerspectiveCamera,
   Ray,
   SphereGeometry
-} from 'https://unpkg.com/three/build/three.module.js'
+} from 'three'
 import OrbitControls from '../utils/OrbitControls.js'
 import { Geo, Mat, Obj3D, Scene } from '../utils/my-three-plus'
 

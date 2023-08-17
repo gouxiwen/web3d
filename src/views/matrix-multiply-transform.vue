@@ -7,7 +7,7 @@
 <script setup>
 import { onMounted } from 'vue'
 import { initShaders } from '../utils/helper'
-import { Matrix4, Quaternion, Vector3 } from 'https://unpkg.com/three/build/three.module.js'
+import { Matrix4, Quaternion, Vector3 } from 'three'
 // 复合变换：
 // 一次变换就是用向量乘以变换矩阵，那复合变换就是用向量乘以第一个变换矩阵，得到的向量继续乘以下一个变换矩阵，以此类推
 // 以上过程可以改为先用矩阵相乘得到的结果再乘以向量

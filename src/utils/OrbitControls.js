@@ -1,4 +1,4 @@
-import { Matrix4, Vector2, Vector3, Spherical } from 'https://unpkg.com/three/build/three.module.js'
+import { Matrix4, Vector2, Vector3, Spherical } from 'three'
 
 const pi2 = Math.PI * 2
 const pvMatrix = new Matrix4()
@@ -18,7 +18,10 @@ const defAttr = () => ({
   screenSpacePanning: true,
   zoomScale: 0.95,
   spherical: new Spherical(),
-  rotateDir: 'xy'
+  rotateDir: 'xy',
+  enablePan: true,
+  minZoom: 0,
+  maxZoom: Infinity
 })
 
 export default class OrbitControls {
@@ -41,12 +44,13 @@ export default class OrbitControls {
       dragStart,
       dragEnd,
       state,
-      camera: { type }
+      camera: { type },
+      enablePan
     } = this
     dragEnd.set(clientX, clientY)
     switch (state) {
       case 'pan':
-        this[`pan${type}`](dragEnd.clone().sub(dragStart))
+        enablePan && this[`pan${type}`](dragEnd.clone().sub(dragStart))
         break
       case 'rotate':
         this.rotate(dragEnd.clone().sub(dragStart))
@@ -57,11 +61,8 @@ export default class OrbitControls {
   pointerup() {
     this.state = 'none'
   }
-  wheel({ deltaY }) {
-    const {
-      zoomScale,
-      camera: { type }
-    } = this
+  wheel({ deltaY }, type = this.camera.type) {
+    const { zoomScale } = this
     let scale = deltaY < 0 ? zoomScale : 1 / zoomScale
     this[`dolly${type}`](scale)
   }
@@ -70,10 +71,10 @@ export default class OrbitControls {
     this.updateSph()
   }
   dollyOrthographicCamera(dollyScale) {
-    const { camera } = this
-    camera.zoom *= dollyScale
-    camera.updateProjectionMatrix()
-    this.updateSph()
+    const { camera, maxZoom, minZoom } = this
+    const zoom = camera.zoom * dollyScale
+    camera.zoom = Math.max(Math.min(maxZoom, zoom), minZoom)
+    // this.updateSph()
   }
   panPerspectiveCamera({ x, y }) {
     const {

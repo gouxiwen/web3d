@@ -1,7 +1,10 @@
 <template>
-  <div>光-纹理映射</div>
+  <div>光-纹理映射-VR+陀螺仪</div>
   <div class="container">
     <canvas id="canvas"></canvas>
+    <div class="wrapper">
+      <div id="playBtn">开启VR之旅</div>
+    </div>
   </div>
 </template>
 <script setup>
@@ -19,11 +22,9 @@ import {
 } from 'three'
 import OrbitControls from '../utils/OrbitControls.js'
 import { Geo, Mat, Obj3D, Scene } from '../utils/my-three-plus'
-import Geography from '../utils/Geography.js'
-import Earth from '../utils/Earth.js'
-import Rect from '../utils/Rect.js'
-import earthImg from '../assets/images/earth.jpg'
-import markImg from '../assets/images/mark.png'
+import Box from '../utils/Box.js'
+import Gyro from '../utils/Gyro.js'
+import magicImg from '../assets/images/magic.jpg'
 
 // 顶点着色器
 const vsSource = `
@@ -46,8 +47,11 @@ const fsSource = `
     gl_FragColor=texture2D(u_Sampler,v_Pin);
   }
   `
-
-let gl, camera, scene, orbit
+const isPC = () =>
+  !navigator.userAgent.match(
+    /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i
+  )
+let gl, camera, scene, orbit, endPos, endFov
 const init = () => {
   const canvas = document.getElementById('canvas')
   if (canvas) {
@@ -62,31 +66,29 @@ const init = () => {
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
     gl.enable(gl.DEPTH_TEST) // 深度测试可以解决物体的遮挡问题，不然后面的物体可能挡住前面的物体。
 
-    // 球体
-    const earth = new Earth(0.5, 64, 32)
-
-    // 矩形面-标记点
-    const rect = new Rect(0.02, 0.02, 0.5, 0)
+    // 立方体
+    const box = new Box(1, 1, 1)
 
     // 目标点
     const target = new Vector3()
-    // 标记点坐标
-    const rad = Math.PI / 180
-    const geography = new Geography(earth.r, 116.404 * rad, 39.915 * rad)
-    // 标记点模型矩阵
-    const modelMatrix = new Matrix4()
-      .setPosition(geography.position)
-      .multiply(new Matrix4().lookAt(geography.position, target, new Vector3(0, 1, 0))) // 让标记点贴合到地球表面
-    //视点
-    // const eye = new Vector3(2, 0, 0)
-    // 让相机的视点直视标记点。
-    const eye = geography.clone().setR(earth.r + 1).position
-    const [fov, aspect, near, far] = [45, canvas.width / canvas.height, 0.1, 5]
+    //视点-根据陀螺仪做欧拉旋转
+    const eye = new Vector3(0.15, 0, 0.0001)
     // 透视相机
+    const [fov, aspect, near, far] = [130, canvas.width / canvas.height, 0.01, 2]
     camera = new PerspectiveCamera(fov, aspect, near, far)
-    camera.position.copy(eye)
+    // 上帝视角
+    camera.position.set(0, 0.42, 0)
+    endPos = camera.position.clone()
+    endFov = fov
     // 轨道控制器
-    orbit = new OrbitControls({ camera, target, dom: canvas })
+    orbit = new OrbitControls({
+      camera,
+      target,
+      dom: canvas,
+      enablePan: false,
+      maxZoom: 15,
+      minZoom: 0.4
+    })
 
     // 场景
     scene = new Scene({ gl })
@@ -97,8 +99,8 @@ const init = () => {
       uniformNames: ['u_PvMatrix', 'u_ModelMatrix', 'u_Sampler']
     })
 
-    //地球
-    const matEarth = new Mat({
+    //立方体
+    const matBox = new Mat({
       program: 'map',
       data: {
         u_PvMatrix: {
@@ -111,78 +113,72 @@ const init = () => {
         }
       }
     })
-    const geoEarth = new Geo({
+    const geoBox = new Geo({
       data: {
         a_Position: {
-          array: earth.vertices,
+          array: box.vertices,
           size: 3
         },
         a_Pin: {
-          array: earth.uv,
+          array: box.uv,
           size: 2
         }
       },
       index: {
-        array: earth.indexes
-      }
-    })
-
-    // 标记点
-    const matMark = new Mat({
-      program: 'map',
-      data: {
-        u_PvMatrix: {
-          value: orbit.getPvMatrix().elements,
-          type: 'uniformMatrix4fv'
-        },
-        u_ModelMatrix: {
-          value: modelMatrix.elements,
-          type: 'uniformMatrix4fv'
-        }
-      }
-    })
-    const geoMark = new Geo({
-      data: {
-        a_Position: {
-          array: rect.vertices,
-          size: 3
-        },
-        a_Pin: {
-          array: rect.uv,
-          size: 2
-        }
-      },
-      index: {
-        array: rect.indexes
+        array: box.indexes
       }
     })
 
     //加载图片
-    const promises = [earthImg, markImg].map((ele) => {
+    const promises = [magicImg].map((ele) => {
       const image = new Image()
       image.src = ele
       return imgPromise(image)
     })
     Promise.all(promises).then((imgs) => {
-      matEarth.maps.u_Sampler = { image: imgs[0] }
-      matMark.maps.u_Sampler = {
-        image: imgs[1],
-        format: gl.RGBA
-      }
+      matBox.maps.u_Sampler = { image: imgs[0], magFilte: gl.LINEAR, minFilter: gl.LINEAR }
       scene.add(
         new Obj3D({
-          geo: geoEarth,
-          mat: matEarth
-        })
-      )
-      scene.add(
-        new Obj3D({
-          geo: geoMark,
-          mat: matMark
+          geo: geoBox,
+          mat: matBox
         })
       )
       render()
     })
+    // 遮罩
+    const wrapper = document.querySelector('.wrapper')
+    // 按钮
+    const btn = document.querySelector('#playBtn')
+    // 陀螺仪
+    const gyro = new Gyro({
+      btn,
+      noDevice: () => {
+        btn.innerHTML = '您的设备里没有陀螺仪！'
+      },
+      reject: () => {
+        btn.innerHTML = '请允许使用陀螺仪🌹'
+      },
+      error: () => {
+        btn.innerHTML = '请求失败！'
+      },
+      init: () => {
+        wrapper.style.display = 'none'
+      },
+      change: (euler) => {
+        camera.position.copy(eye.clone().applyEuler(euler))
+        orbit.updateCamera()
+        orbit.resetSpherical()
+        endFov = 100
+        endPos.copy(eye.clone().applyEuler(euler))
+      },
+      onClick: () => {
+        if (isPC()) {
+          endPos.set(0.15, 0, 0.0001)
+          endFov = 100
+        }
+      }
+    })
+    gyro.start()
 
     bindEvent(canvas)
   }
@@ -207,12 +203,26 @@ const bindEvent = (canvas) => {
   })
   /* 滚轮事件 */
   canvas.addEventListener('wheel', (event) => {
-    orbit.wheel(event)
+    orbit.wheel(event, 'OrthographicCamera')
   })
+}
+
+function tween(ratio = 0.05) {
+  //若当前设备为PC,缓动结束后就不再缓动，之后的变换交给轨道控制器
+  if (isPC() && camera.fov < endFov + 1) {
+    return
+  }
+
+  camera.position.lerp(endPos, ratio)
+  camera.fov += (endFov - camera.fov) * ratio
+  camera.updateProjectionMatrix()
+  orbit.updateCamera()
+  orbit.resetSpherical()
 }
 
 // 连续渲染
 function render() {
+  tween()
   orbit.getPvMatrix()
   scene.draw()
   requestAnimationFrame(render)
@@ -225,5 +235,28 @@ onMounted(() => {
 <style scoped lang="less">
 .container {
   height: calc(100vh - 18px);
+  .wrapper {
+    display: flex;
+    position: absolute;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 10;
+  }
+  #playBtn {
+    padding: 24px 24px;
+    border-radius: 24px;
+    background-color: #00acec;
+    text-align: center;
+    color: #fff;
+    cursor: pointer;
+    font-size: 24px;
+    font-weight: bold;
+    border: 6px solid rgba(255, 255, 255, 0.7);
+    box-shadow: 0 9px 9px rgba(0, 0, 0, 0.7);
+  }
 }
 </style>

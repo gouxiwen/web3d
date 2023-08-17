@@ -8,7 +8,7 @@
 import { onMounted } from 'vue'
 import { initShaders, ScaleLinear, SinFn } from '../utils/helper'
 import Poly from '../utils/Poly-wave'
-import { Matrix4, Quaternion, Vector3 } from 'https://unpkg.com/three/build/three.module.js'
+import { Matrix4, Quaternion, Vector3 } from 'three'
 // 正弦型函数的图像性质 y=Asin(ωx+φ):
 // A 影响的是正弦曲线的波动幅度
 // φ 影响的是正弦曲线的平移

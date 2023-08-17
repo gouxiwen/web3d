@@ -24,15 +24,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { initShaders, imgPromise, createProgram } from '../utils/helper'
-import {
-  Matrix4,
-  Vector3,
-  Vector2,
-  Spherical,
-  Object3D,
-  PerspectiveCamera,
-  Ray
-} from 'https://unpkg.com/three/build/three.module.js'
+import { Matrix4, Vector3, Vector2, Spherical, Object3D, PerspectiveCamera, Ray } from 'three'
 import OrbitControls from '../utils/OrbitControls.js'
 import { Geo, Mat, Obj3D, Scene } from '../utils/my-three-plus'
 import Compose from '../utils/Compose.js'

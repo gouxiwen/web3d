@@ -7,14 +7,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { initShaders, imgPromise } from '../utils/helper'
-import {
-  Matrix4,
-  Vector3,
-  Vector2,
-  Spherical,
-  Object3D,
-  OrthographicCamera
-} from 'https://unpkg.com/three/build/three.module.js'
+import { Matrix4, Vector3, Vector2, Spherical, Object3D, OrthographicCamera } from 'three'
 import Poly from '../utils/Poly-texture'
 // 坐标系转换：
 // 坐标系是一个四维矩阵

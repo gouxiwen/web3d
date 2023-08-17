@@ -1,5 +1,5 @@
 // 地理坐标系Geography对象，方便把经纬度转三维直角坐标。
-import { Vector3 } from 'https://unpkg.com/three/build/three.module.js'
+import { Vector3 } from 'three'
 
 /*
 属性：

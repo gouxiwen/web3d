@@ -7,14 +7,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { initShaders, imgPromise } from '../utils/helper'
-import {
-  Matrix4,
-  Vector3,
-  Vector2,
-  Spherical,
-  Object3D,
-  PerspectiveCamera
-} from 'https://unpkg.com/three/build/three.module.js'
+import { Matrix4, Vector3, Vector2, Spherical, Object3D, PerspectiveCamera } from 'three'
 import Poly from '../utils/Poly-texture'
 
 // 投影矩阵：

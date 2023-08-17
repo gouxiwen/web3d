@@ -7,7 +7,7 @@
 <script setup>
 import { onMounted } from 'vue'
 import { initShaders } from '../utils/helper'
-import { Matrix4, Quaternion, Vector3 } from 'https://unpkg.com/three/build/three.module.js'
+import { Matrix4, Quaternion, Vector3 } from 'three'
 // 相机的定义:
 // 视点：相机的位置
 // 视线方向：相机所看的方向

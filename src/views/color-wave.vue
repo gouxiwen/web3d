@@ -8,7 +8,7 @@
 import { onMounted, ref } from 'vue'
 import { initShaders, ScaleLinear, SinFn } from '../utils/helper'
 import Poly from '../utils/Poly-color-wave'
-import { Matrix4, Vector3, Color } from 'https://unpkg.com/three/build/three.module.js'
+import { Matrix4, Vector3, Color } from 'three'
 
 onMounted(() => {
   // canvas 画布

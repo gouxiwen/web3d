@@ -7,7 +7,7 @@
 <script setup>
 import { onMounted } from 'vue'
 import { initShaders } from '../utils/helper'
-import { Matrix4 } from 'https://unpkg.com/three/build/three.module.js'
+import { Matrix4 } from 'three'
 // 点旋转公式：
 // 点A(ax,ay)围绕z轴旋β度,其旋转后的位置是点B(bx,by)，则：
 // bx=cosβ*ax-sinβ*ay

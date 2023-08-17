@@ -37,6 +37,10 @@ import { RouterLink, RouterView } from 'vue-router'
       <RouterLink to="/three-world5">三维世界-别墅室内布局</RouterLink>
       <RouterLink to="/light1">光-反射</RouterLink>
       <RouterLink to="/light2">光-纹理映射</RouterLink>
+      <RouterLink to="/light3">光-纹理映射-VR</RouterLink>
+      <RouterLink to="/light4">光-纹理映射-VR+陀螺仪</RouterLink>
+      <RouterLink to="/light5">光-纹理映射-VR-切换场景</RouterLink>
+      <RouterLink to="/light6">光-纹理映射-VR-切换场景(过渡)</RouterLink>
     </nav>
   </header>
   <RouterView />

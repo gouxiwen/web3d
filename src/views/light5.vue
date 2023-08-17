@@ -1,7 +1,8 @@
 <template>
-  <div>光-纹理映射</div>
+  <div>光-纹理映射-VR-切换场景</div>
   <div class="container">
     <canvas id="canvas"></canvas>
+    <div id="marks"></div>
   </div>
 </template>
 <script setup>
@@ -21,9 +22,12 @@ import OrbitControls from '../utils/OrbitControls.js'
 import { Geo, Mat, Obj3D, Scene } from '../utils/my-three-plus'
 import Geography from '../utils/Geography.js'
 import Earth from '../utils/Earth.js'
-import Rect from '../utils/Rect.js'
-import earthImg from '../assets/images/earth.jpg'
-import markImg from '../assets/images/mark.png'
+import Gyro from '../utils/Gyro.js'
+import roomImg0 from '../assets/images/room3.jpg'
+import roomImg1 from '../assets/images/mainBed.jpg'
+import roomImg2 from '../assets/images/secBed.jpg'
+
+const imgArr = [roomImg0, roomImg1, roomImg2]
 
 // 顶点着色器
 const vsSource = `
@@ -47,7 +51,7 @@ const fsSource = `
   }
   `
 
-let gl, camera, scene, orbit
+let gl, earth, target, camera, scene, orbit, pvMatrix, marks, data, curVr, mat
 const init = () => {
   const canvas = document.getElementById('canvas')
   if (canvas) {
@@ -63,30 +67,26 @@ const init = () => {
     gl.enable(gl.DEPTH_TEST) // 深度测试可以解决物体的遮挡问题，不然后面的物体可能挡住前面的物体。
 
     // 球体
-    const earth = new Earth(0.5, 64, 32)
-
-    // 矩形面-标记点
-    const rect = new Rect(0.02, 0.02, 0.5, 0)
+    earth = new Earth(0.5, 64, 32)
 
     // 目标点
-    const target = new Vector3()
-    // 标记点坐标
-    const rad = Math.PI / 180
-    const geography = new Geography(earth.r, 116.404 * rad, 39.915 * rad)
-    // 标记点模型矩阵
-    const modelMatrix = new Matrix4()
-      .setPosition(geography.position)
-      .multiply(new Matrix4().lookAt(geography.position, target, new Vector3(0, 1, 0))) // 让标记点贴合到地球表面
-    //视点
-    // const eye = new Vector3(2, 0, 0)
-    // 让相机的视点直视标记点。
-    const eye = geography.clone().setR(earth.r + 1).position
-    const [fov, aspect, near, far] = [45, canvas.width / canvas.height, 0.1, 5]
-    // 透视相机
+    target = new Vector3()
+    const [fov, aspect, near, far] = [60, canvas.width / canvas.height, 0.1, 5]
     camera = new PerspectiveCamera(fov, aspect, near, far)
-    camera.position.copy(eye)
     // 轨道控制器
-    orbit = new OrbitControls({ camera, target, dom: canvas })
+    orbit = new OrbitControls({
+      camera,
+      target,
+      dom: canvas,
+      enablePan: false,
+      maxZoom: 15,
+      minZoom: 0.4
+    })
+
+    //投影视图矩阵
+    pvMatrix = orbit.getPvMatrix()
+    // 标记
+    marks = document.querySelector('#marks')
 
     // 场景
     scene = new Scene({ gl })
@@ -97,8 +97,8 @@ const init = () => {
       uniformNames: ['u_PvMatrix', 'u_ModelMatrix', 'u_Sampler']
     })
 
-    //地球
-    const matEarth = new Mat({
+    //球体
+    mat = new Mat({
       program: 'map',
       data: {
         u_PvMatrix: {
@@ -109,9 +109,15 @@ const init = () => {
           value: new Matrix4().elements,
           type: 'uniformMatrix4fv'
         }
+      },
+      maps: {
+        u_Sampler: {
+          magFilter: gl.LINEAR,
+          minFilter: gl.LINEAR
+        }
       }
     })
-    const geoEarth = new Geo({
+    const geo = new Geo({
       data: {
         a_Position: {
           array: earth.vertices,
@@ -126,65 +132,18 @@ const init = () => {
         array: earth.indexes
       }
     })
-
-    // 标记点
-    const matMark = new Mat({
-      program: 'map',
-      data: {
-        u_PvMatrix: {
-          value: orbit.getPvMatrix().elements,
-          type: 'uniformMatrix4fv'
-        },
-        u_ModelMatrix: {
-          value: modelMatrix.elements,
-          type: 'uniformMatrix4fv'
-        }
-      }
-    })
-    const geoMark = new Geo({
-      data: {
-        a_Position: {
-          array: rect.vertices,
-          size: 3
-        },
-        a_Pin: {
-          array: rect.uv,
-          size: 2
-        }
-      },
-      index: {
-        array: rect.indexes
-      }
-    })
-
-    //加载图片
-    const promises = [earthImg, markImg].map((ele) => {
-      const image = new Image()
-      image.src = ele
-      return imgPromise(image)
-    })
-    Promise.all(promises).then((imgs) => {
-      matEarth.maps.u_Sampler = { image: imgs[0] }
-      matMark.maps.u_Sampler = {
-        image: imgs[1],
-        format: gl.RGBA
-      }
-      scene.add(
-        new Obj3D({
-          geo: geoEarth,
-          mat: matEarth
-        })
-      )
-      scene.add(
-        new Obj3D({
-          geo: geoMark,
-          mat: matMark
-        })
-      )
-      render()
-    })
+    scene.add(new Obj3D({ geo, mat }))
 
     bindEvent(canvas)
+
+    import('../data/vr.json').then((dt) => {
+      data = dt.default
+      curVr = getVrById(1)
+      //更新VR
+      updateVr()
+      // 渲染
+      render()
+    })
   }
 }
 
@@ -198,8 +157,9 @@ const bindEvent = (canvas) => {
     orbit.pointerdown(event)
   })
   /* 指针移动时，若控制器处于平移状态，平移相机；若控制器处于旋转状态，旋转相机。 */
-  canvas.addEventListener('pointermove', (event) => {
+  window.addEventListener('pointermove', (event) => {
     orbit.pointermove(event)
+    updateMarkCp()
   })
   /* 指针抬起 */
   canvas.addEventListener('pointerup', (event) => {
@@ -207,14 +167,80 @@ const bindEvent = (canvas) => {
   })
   /* 滚轮事件 */
   canvas.addEventListener('wheel', (event) => {
-    orbit.wheel(event)
+    orbit.wheel(event, 'OrthographicCamera')
+    updateMarkCp()
+  })
+
+  marks.addEventListener('click', ({ target }) => {
+    if (target.className !== 'mark') {
+      return
+    }
+    marks.innerHTML = ''
+    curVr = getVrById(parseInt(target.getAttribute('data-link')))
+    updateVr()
+  })
+}
+
+//根据id获取VR数据
+function getVrById(id) {
+  for (let i = 0; i < data.length; i++) {
+    if (id === data[i].id) {
+      return data[i]
+    }
+  }
+}
+
+//根据数据更新VR
+function updateVr() {
+  const image = new Image()
+  image.src = imgArr[curVr.imgSrc - 1]
+  image.onload = function () {
+    //更新图片
+    mat.setMap('u_Sampler', { image })
+    //更新相机视点
+    camera.position.set(...curVr.eye)
+    orbit.updateCamera()
+    orbit.resetSpherical()
+    //显示标记点
+    showMark()
+  }
+}
+
+//显示标记点
+function showMark() {
+  curVr.marks.forEach((ele) => {
+    const div = document.createElement('div')
+    div.className = 'mark'
+    div.innerText = ele.name
+    div.setAttribute('data-link', ele.link)
+    marks.append(div)
+  })
+}
+
+//更新标记点的canvas坐标位
+function updateMarkCp() {
+  if (!marks.children.length) {
+    return
+  }
+  const { position } = camera
+  const EO = target.clone().sub(position)
+  curVr.marks.forEach((ele, ind) => {
+    const markWp = new Vector3(...ele.pos)
+    const mark = marks.children[ind]
+    const dot = markWp.clone().sub(position).dot(EO)
+    mark.style.display = dot > 0 ? 'block' : 'none'
+    const { x, y } = markWp.clone().applyMatrix4(pvMatrix)
+    mark.style.left = `${((x + 1) * canvas.width) / 2}px`
+    mark.style.top = `${((-y + 1) * canvas.height) / 2}px`
   })
 }
 
 // 连续渲染
 function render() {
+  // tween()
   orbit.getPvMatrix()
   scene.draw()
+  updateMarkCp()
   requestAnimationFrame(render)
 }
 
@@ -225,5 +251,18 @@ onMounted(() => {
 <style scoped lang="less">
 .container {
   height: calc(100vh - 18px);
+  position: relative;
+  :deep(.mark) {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    top: 0;
+    left: 0;
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 6px 12px;
+    border-radius: 3px;
+    user-select: none;
+    cursor: pointer;
+  }
 }
 </style>
