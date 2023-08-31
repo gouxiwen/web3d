@@ -182,6 +182,11 @@ const router = createRouter({
       path: '/light6',
       name: 'light6',
       component: () => import('../views/light6.vue')
+    },
+    {
+      path: '/jsx',
+      name: 'jsx',
+      component: () => import('../views/jsx.jsx')
     }
   ]
 })

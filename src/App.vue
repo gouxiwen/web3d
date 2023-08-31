@@ -5,6 +5,7 @@ import { RouterLink, RouterView } from 'vue-router'
 <template>
   <header>
     <nav>
+      <RouterLink to="/jsx">JSXDemo</RouterLink>
       <RouterLink to="/">Base</RouterLink>
       <RouterLink to="/sky">Sky</RouterLink>
       <RouterLink to="/triangle">Triangle</RouterLink>
