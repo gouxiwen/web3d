@@ -1,5 +1,5 @@
 <template>
-  <a-layout style="min-height: 100vh">
+  <a-layout class="app-root">
     <a-layout-sider class="AppSider">
       <MenuList />
     </a-layout-sider>
@@ -15,7 +15,11 @@
 import { RouterView } from 'vue-router'
 import MenuList from '@/components/MenuList.vue'
 </script>
-<style>
+<style lang="less" scoped>
+.AppSider {
+  height: 100vh;
+  overflow: auto;
+}
 .AppContainer {
   background-color: #000;
   color: #fff;
