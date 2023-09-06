@@ -29,12 +29,12 @@ import OrbitControls from '../../utils/OrbitControls.js'
 import { Geo, Mat, Obj3D, Scene } from '../../utils/my-three-plus'
 import Compose from '../../utils/Compose.js'
 import Track from '../../utils/Track.js'
-import f1b from '../assets/images/-1.png'
-import f2b from '../assets/images/-2.png'
-import f1 from '../assets/images/1.png'
-import f2 from '../assets/images/2.png'
-import f3 from '../assets/images/3.png'
-import f4 from '../assets/images/4.png'
+import f1b from '../../assets/images/-1.png'
+import f2b from '../../assets/images/-2.png'
+import f1 from '../../assets/images/1.png'
+import f2 from '../../assets/images/2.png'
+import f3 from '../../assets/images/3.png'
+import f4 from '../../assets/images/4.png'
 
 const model = ref('auto')
 

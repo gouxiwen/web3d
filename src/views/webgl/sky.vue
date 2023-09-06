@@ -94,7 +94,7 @@ onMounted(() => {
 <style scoped>
 .container {
   height: calc(100vh - 18px);
-  background: url('../assets/images/sky.jpg');
+  background: url('../../assets/images/sky.jpg');
   background-size: cover;
   background-position: right bottom;
 }

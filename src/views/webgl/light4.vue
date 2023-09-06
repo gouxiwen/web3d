@@ -24,7 +24,7 @@ import OrbitControls from '../../utils/OrbitControls.js'
 import { Geo, Mat, Obj3D, Scene } from '../../utils/my-three-plus'
 import Box from '../../utils/Box.js'
 import Gyro from '../../utils/Gyro.js'
-import magicImg from '../assets/images/magic.jpg'
+import magicImg from '../../assets/images/magic.jpg'
 
 // 顶点着色器
 const vsSource = `

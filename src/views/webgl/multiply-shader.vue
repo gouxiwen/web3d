@@ -7,7 +7,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { createProgram } from '../../utils/helper'
-import img from '../assets/images/erha.jpg'
+import img from '../../assets/images/erha.jpg'
 
 onMounted(() => {
   // canvas 画布

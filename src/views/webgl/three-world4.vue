@@ -56,7 +56,6 @@ onMounted(() => {
     target,
     dom: canvas
   })
-  orbit.update()
 
   // 投影视图矩阵
   const pvMatrix = new Matrix4()

@@ -8,8 +8,8 @@
 import { onMounted, ref } from 'vue'
 import { initShaders, getMousePosInWebgl } from '../../utils/helper'
 import Poly from '../../utils/Poly-texture'
-// import img from '../assets/images/sky.jpg' // 非二次幂图像
-import img from '../assets/images/erha.jpg'
+// import img from '../../assets/images/sky.jpg' // 非二次幂图像
+import img from '../../assets/images/erha.jpg'
 
 onMounted(() => {
   // canvas 画布

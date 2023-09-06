@@ -7,8 +7,8 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { initShaders, getMousePosInWebgl } from '../../utils/helper'
-// import img from '../assets/images/sky.jpg' // 非二次幂图像
-import img from '../assets/images/mf.jpg'
+// import img from '../../assets/images/sky.jpg' // 非二次幂图像
+import img from '../../assets/images/mf.jpg'
 import { Matrix4, Vector3 } from 'three'
 
 onMounted(() => {

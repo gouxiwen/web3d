@@ -23,9 +23,9 @@ import { Geo, Mat, Obj3D, Scene } from '../../utils/my-three-plus'
 import Geography from '../../utils/Geography.js'
 import Earth from '../../utils/Earth.js'
 import Gyro from '../../utils/Gyro.js'
-import roomImg0 from '../assets/images/room3.jpg'
-import roomImg1 from '../assets/images/mainBed.jpg'
-import roomImg2 from '../assets/images/secBed.jpg'
+import roomImg0 from '../../assets/images/room3.jpg'
+import roomImg1 from '../../assets/images/mainBed.jpg'
+import roomImg2 from '../../assets/images/secBed.jpg'
 
 const imgArr = [roomImg0, roomImg1, roomImg2]
 

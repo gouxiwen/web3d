@@ -9,14 +9,14 @@ import { onMounted, ref } from 'vue'
 import { initShaders, imgPromise } from '../../utils/helper'
 import Track from '../../utils/Track'
 import Poly from '../../utils/Poly-texture'
-// import img from '../assets/images/sky.jpg' // 非二次幂图像
-import dress from '../assets/images/dress.jpg'
-import maskDress from '../assets/images/mask-dress.jpg'
-import p0 from '../assets/images/pattern0.jpg'
-import p1 from '../assets/images/pattern1.jpg'
-import p2 from '../assets/images/pattern2.jpg'
-import p3 from '../assets/images/pattern3.jpg'
-import p4 from '../assets/images/pattern4.jpg'
+// import img from '../../assets/images/sky.jpg' // 非二次幂图像
+import dress from '../../assets/images/dress.jpg'
+import maskDress from '../../assets/images/mask-dress.jpg'
+import p0 from '../../assets/images/pattern0.jpg'
+import p1 from '../../assets/images/pattern1.jpg'
+import p2 from '../../assets/images/pattern2.jpg'
+import p3 from '../../assets/images/pattern3.jpg'
+import p4 from '../../assets/images/pattern4.jpg'
 
 onMounted(() => {
   // canvas 画布

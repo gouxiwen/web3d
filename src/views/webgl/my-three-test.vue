@@ -18,7 +18,7 @@ import {
 } from 'three'
 import OrbitControls from '../../utils/OrbitControls.js'
 import { Geo, Mat, Obj3D, Scene } from '../../utils/my-three'
-import img from '../assets/images/erha.jpg'
+import img from '../../assets/images/erha.jpg'
 
 onMounted(() => {
   // canvas 画布

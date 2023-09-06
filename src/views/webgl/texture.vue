@@ -7,8 +7,8 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { initShaders, getMousePosInWebgl } from '../../utils/helper'
-// import img from '../assets/images/sky.jpg' // 非二次幂图像
-import img from '../assets/images/erha.jpg'
+// import img from '../../assets/images/sky.jpg' // 非二次幂图像
+import img from '../../assets/images/erha.jpg'
 
 // 使用图钉选择图形的位置
 // uv坐标系，也叫st坐标系。

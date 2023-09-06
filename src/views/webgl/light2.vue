@@ -22,8 +22,8 @@ import { Geo, Mat, Obj3D, Scene } from '../../utils/my-three-plus'
 import Geography from '../../utils/Geography.js'
 import Earth from '../../utils/Earth.js'
 import Rect from '../../utils/Rect.js'
-import earthImg from '../assets/images/earth.jpg'
-import markImg from '../assets/images/mark.png'
+import earthImg from '../../assets/images/earth.jpg'
+import markImg from '../../assets/images/mark.png'
 
 // 顶点着色器
 const vsSource = `
