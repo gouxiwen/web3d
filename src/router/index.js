@@ -226,6 +226,16 @@ export const routes = [
         name: 'buffer3',
         component: () => import('@/views/three/buffer3.vue'),
       },
+      {
+        path: 'tree1',
+        name: 'tree1',
+        component: () => import('@/views/three/tree1.vue'),
+      },
+      {
+        path: 'tree2',
+        name: 'tree2',
+        component: () => import('@/views/three/tree2.vue'),
+      }
     ]
   },
   {
