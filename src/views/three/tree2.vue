@@ -67,6 +67,11 @@ stage.camera = camera
   light.shadow.camera.near = 1
   light.shadow.camera.far = 50
 }
+// 要使用阴影材质，要具备以下条件：
+// 开启渲染对象的shadowMap属性。
+// 需要有物体castShadow。
+// 需要有灯光照射物体，并castShadow。
+// ShadowMaterial材质的物体需要receiveShadow。
 
 {
   // 平行光2
