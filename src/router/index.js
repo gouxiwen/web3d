@@ -235,6 +235,11 @@ export const routes = [
         path: 'tree2',
         name: 'tree2',
         component: () => import('@/views/three/tree2.vue'),
+      },
+      {
+        path: 'car',
+        name: 'car',
+        component: () => import('@/views/three/car.vue'),
       }
     ]
   },
