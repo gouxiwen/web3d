@@ -240,9 +240,16 @@ export const routes = [
         path: 'machineRoom',
         name: 'machineRoom',
         component: () => import('@/views/three/machineRoom.vue'),
+      },
+      {
         path: 'car',
         name: 'car',
         component: () => import('@/views/three/car.vue'),
+      },
+      {
+        path: 'car2',
+        name: 'car2',
+        component: () => import('@/views/three/car2.vue'),
       }
     ]
   },

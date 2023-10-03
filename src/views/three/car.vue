@@ -60,7 +60,7 @@ car.add(wheelGroup2)
 car.add(wheelGroup3)
 car.add(wheelGroup4)
 
-// 轮胎 -group
+// 轮胎 - group
 const cirle = new Group()
 const n = 20
 const r = 0.5
