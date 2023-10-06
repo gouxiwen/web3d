@@ -34,7 +34,7 @@ const wheelMesh = new Mesh(wheelG, m)
 // 轮毂
 const n = 10
 for (let index = 0; index < n; index++) {
-  const g = new CylinderGeometry(0.02, 0.02, 1)
+  const g = new CylinderGeometry(0.02, 0.02, radius * 2)
   const mesh = new Mesh(g, m)
   mesh.rotation.z = Math.PI * 2 / n * index
   wheel1.add(mesh)
