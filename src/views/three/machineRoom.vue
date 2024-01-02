@@ -47,7 +47,7 @@ const state = ref({
 
 // 鼠标移动事件
 const mouseMove = ({ clientX, clientY }) => {
-  room.selectCabinet(clientX, clientY)
+  room.selectCabinet(clientX - canvas.getBoundingClientRect().left, clientY)
 }
 
 onMounted(() => {
@@ -55,8 +55,8 @@ onMounted(() => {
   if (!canvas) {
     return
   }
-  canvas.width = window.innerWidth
-  canvas.height = window.innerHeight
+  canvas.width = canvas.getBoundingClientRect().width
+  canvas.height = canvas.getBoundingClientRect().height
   room = new MachineRoom(canvas, '/models/')
   room.loadGLTF('machineRoom.gltf')
   room.animate()

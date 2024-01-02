@@ -73,9 +73,9 @@ const uvAttr = new BufferAttribute(new Float32Array(uvs), uvNumComponents)
 geometry.setAttribute('position', positionAttr)
 geometry.setAttribute('normal', normalAttr)
 geometry.setAttribute('uv', uvAttr)
-// 如果没有定义法线，可以利用一下方法来计算出来
+// 如果没有定义法线，可以利用以下方法来计算出来
 // geometry.computeVertexNormals()
-// 设置索引
+// 设置索引 如果该 attribute 没有设置过，则 renderer 假设每三个连续的位置代表一个三角面片。 默认值是 null。
 geometry.setIndex([
   // front
   0, 1, 2, 2, 1, 3,

@@ -8,7 +8,7 @@ export const routes = [
       {
         path: 'home',
         name: 'home',
-        component: () => import('@/views/webgl/HomeView.vue'),
+        component: () => import('@/views/webgl/HomeView.vue')
       },
       {
         path: 'base',
@@ -194,7 +194,7 @@ export const routes = [
         path: 'stencil-buffer',
         name: 'stencil-buffer',
         component: () => import('../views/webgl/stencil-buffer.vue')
-      },
+      }
     ]
   },
   {
@@ -204,45 +204,47 @@ export const routes = [
       {
         path: 'plane',
         name: 'plane',
-        component: () => import('@/views/three/plane.vue'),
+        component: () => import('@/views/three/plane.vue')
       },
       {
         path: 'sphere',
         name: 'sphere',
-        component: () => import('@/views/three/sphere.vue'),
+        component: () => import('@/views/three/sphere.vue')
       },
       {
         path: 'buffer1',
         name: 'buffer1',
-        component: () => import('@/views/three/buffer1.vue'),
+        component: () => import('@/views/three/buffer1.vue')
       },
       {
         path: 'buffer2',
         name: 'buffer2',
-        component: () => import('@/views/three/buffer2.vue'),
+        component: () => import('@/views/three/buffer2.vue')
       },
       {
         path: 'buffer3',
         name: 'buffer3',
-        component: () => import('@/views/three/buffer3.vue'),
+        component: () => import('@/views/three/buffer3.vue')
       },
       {
         path: 'tree1',
         name: 'tree1',
-        component: () => import('@/views/three/tree1.vue'),
+        component: () => import('@/views/three/tree1.vue')
       },
       {
         path: 'tree2',
         name: 'tree2',
-        component: () => import('@/views/three/tree2.vue'),
+        component: () => import('@/views/three/tree2.vue')
       },
       {
         path: 'machineRoom',
         name: 'machineRoom',
-        component: () => import('@/views/three/machineRoom.vue'),
+        component: () => import('@/views/three/machineRoom.vue')
+      },
+      {
         path: 'car',
         name: 'car',
-        component: () => import('@/views/three/car.vue'),
+        component: () => import('@/views/three/car.vue')
       }
     ]
   },
