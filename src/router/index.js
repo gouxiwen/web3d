@@ -245,6 +245,11 @@ export const routes = [
         path: 'car',
         name: 'car',
         component: () => import('@/views/three/car.vue')
+      },
+      {
+        path: 'bowling',
+        name: 'bowling',
+        component: () => import('@/views/three/bowling.vue')
       }
     ]
   },

@@ -57,7 +57,7 @@ onMounted(() => {
   }
   canvas.width = canvas.getBoundingClientRect().width
   canvas.height = canvas.getBoundingClientRect().height
-  room = new MachineRoom(canvas, '/models/')
+  room = new MachineRoom(canvas, '/machineRoomSource/')
   room.loadGLTF('machineRoom.gltf')
   room.animate()
   //当鼠标划入机柜，显示信息面板
