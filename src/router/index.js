@@ -250,6 +250,16 @@ export const routes = [
         path: 'bowling',
         name: 'bowling',
         component: () => import('@/views/three/bowling.vue')
+      },
+      {
+        path: 'car2',
+        name: 'car2',
+        component: () => import('@/views/three/car2.vue')
+      },
+      {
+        path: 'road',
+        name: 'road',
+        component: () => import('@/views/three/road.vue')
       }
     ]
   },
