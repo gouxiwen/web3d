@@ -40,7 +40,8 @@ import {
   PointLightHelper,
   Color,
   AmbientLight,
-  SpotLight
+  SpotLight,
+  Box3
 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
@@ -58,12 +59,22 @@ const loader = new GLTFLoader()
 loader.setDRACOLoader(dracoLoader)
 
 let scene, renderer, camera, controls, sphere, sphereBody, pinBody, world, bowlingBall, bowlingPin
+/**
+ * 定义项目需要用到的材质
+ */
+const concreteMaterial = new CANNON.Material('concrete') //创建混凝土材质
+const plasticMaterial = new CANNON.Material('plastic') //创建塑料材质
 Howler.volume(0.5)
-const groundSize = new Vector3(6, 0.2, 8)
+const groundSize = new Vector3(20, 0.2, 20)
+let sphereRadius = 0.5 // y等于半径
+let spherePosition = new CANNON.Vec3(0, sphereRadius, 3)
+let pinBodyHeight = 1
+let pinBodyRadius = 0.2
+let pinBodyPosition = new CANNON.Vec3(0, pinBodyHeight / 2, -groundSize.z / 10)
 const initThree = (canvas) => {
   scene = new Scene()
   camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
-  camera.position.set(0, 10, 10)
+  camera.position.set(0, 5, 15)
   camera.lookAt(0, 5, 0)
   renderer = new WebGLRenderer({ antialias: true, canvas })
   // 根据设备像素比决定渲染的像素，贴图不模糊
@@ -74,38 +85,11 @@ const initThree = (canvas) => {
   controls = new OrbitControls(camera, renderer.domElement)
   controls.update()
   createLight()
-  initGround()
-  // initSphere()
-  loadModel('/models/bowlingBall/base.glb', (model) => {
-    model.scale.set(0.7, 0.7, 0.7)
-    // model.position.y = 2
-    const material = new MeshPhongMaterial({
-      color: 0xffff00,
-      specular: 0x7777ff // 高光颜色
-    })
-    model.traverse(function (child) {
-      if (child.isMesh) {
-        child.castShadow = true
-        child.material = material
-      }
-    })
-    bowlingBall = model
-  })
-  loadModel('/models/bowlingPin/base.glb', (model) => {
-    model.scale.set(0.5, 0.5, 0.5)
-    const material = new MeshPhongMaterial({
-      color: 0xffffff,
-      specular: 0x7777ff // 高光颜色
-    })
-    model.traverse(function (child) {
-      if (child.isMesh) {
-        child.castShadow = true
-        child.material = material
-      }
-    })
-    bowlingPin = model
-  })
   initCannon()
+  initGround()
+  initWall()
+  initSphere()
+  initCylinder()
   animate()
 }
 // 创建光源
@@ -120,9 +104,9 @@ const createLight = () => {
   pointLight.castShadow = true // default false 阴影
   scene.add(pointLight)
 
-  const sphereSize = 1
-  const pointLightHelper = new PointLightHelper(pointLight, sphereSize)
-  scene.add(pointLightHelper)
+  // const sphereSize = 1
+  // const pointLightHelper = new PointLightHelper(pointLight, sphereSize)
+  // scene.add(pointLightHelper)
 
   // 平行光
   // const light = new DirectionalLight(0xffffff, 2)
@@ -154,56 +138,86 @@ const initGround = () => {
   // ground.position.y = -0.1
   // ground.receiveShadow = true
   // scene.add(ground) //step 5 添加地面网格
+
+  /**
+   * 创建地板刚体
+   */
+  const floorBody = new CANNON.Body()
+  floorBody.mass = 0 //质量  质量为0时表示该物体是一个固定的物体即不可破坏
+  floorBody.addShape(new CANNON.Plane()) //设置刚体的形状为CANNON.Plane 地面形状
+  floorBody.material = concreteMaterial //设置材质
+  // 由于平面初始化是是竖立着的，所以需要将其旋转至跟现实中的地板一样 横着
+  // 在cannon.js中，我们只能使用四元数(Quaternion)来旋转，可以通过setFromAxisAngle(…)方法，第一个参数是旋转轴，第二个参数是角度
+  floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1, 0, 0), Math.PI * 0.5)
+  world.addBody(floorBody)
+}
+// 创建墙
+const initWall = () => {
+  let texture = new TextureLoader().load(groundImg)
+  texture.wrapS = texture.wrapT = RepeatWrapping
+  texture.repeat.set(1, 4)
+  let geometry = new PlaneGeometry(groundSize.x, 10)
+  // 需要添加光
+  let material = new MeshPhongMaterial({
+    map: texture
+  })
+  let mesh = new Mesh(geometry, material)
+  mesh.position.z = -groundSize.x / 2
+  mesh.position.y = 5
+  mesh.receiveShadow = true
+  scene.add(mesh)
+
+  /**
+   * 创建地板刚体
+   */
+  const floorBody = new CANNON.Body()
+  floorBody.mass = 0 //质量  质量为0时表示该物体是一个固定的物体即不可破坏
+  floorBody.addShape(new CANNON.Plane()) //设置刚体的形状为CANNON.Plane 地面形状
+  floorBody.position.z = -groundSize.x / 2
+  floorBody.material = concreteMaterial //设置材质
+  world.addBody(floorBody)
 }
 // 创建球体
 const initSphere = () => {
   // 圆球体
-  const geometry = new SphereGeometry(0.5, 50, 16)
-  const material = new MeshPhongMaterial({
-    color: 0xffff00,
-    specular: 0x7777ff // 高光颜色
+  // const geometry = new SphereGeometry(0.5, 50, 16)
+  // const material = new MeshPhongMaterial({
+  //   color: 0xffff00,
+  //   specular: 0x7777ff // 高光颜色
+  // })
+  // sphere = new Mesh(geometry, material)
+  // // sphere.position.y = 2
+  // sphere.name = 'ball'
+  // sphere.castShadow = true //default is false 阴影
+  // scene.add(sphere)
+  // bowlingBall = sphere
+  // creatSphereBody()
+  loadModel('/models/bowlingBall/base.glb', (model) => {
+    // model.scale.set(0.7, 0.7, 0.7)
+    const box = new Box3().setFromObject(model)
+    const x = box.max.x - box.min.x
+    // const y = box.max.y - box.min.y
+    // const z = box.max.z - box.min.z
+    sphereRadius = x / 2
+    spherePosition = new CANNON.Vec3(0, sphereRadius, groundSize.z / 2 - sphereRadius)
+    const material = new MeshPhongMaterial({
+      color: 0xffff00,
+      specular: 0x7777ff // 高光颜色
+    })
+    model.traverse(function (child) {
+      if (child.isMesh) {
+        child.castShadow = true
+        child.material = material
+        bowlingBall = child
+      }
+    })
+    creatSphereBody()
   })
-  sphere = new Mesh(geometry, material)
-  // sphere.position.y = 2
-  sphere.name = 'ball'
-  sphere.castShadow = true //default is false 阴影
-  scene.add(sphere)
-  bowlingBall = sphere
 }
-// 加载模型
-const loadModel = (glb, callback) => {
-  loader.load(
-    glb,
-    function (gltf) {
-      const model = gltf.scene
-      scene.add(model)
-      callback(model)
-    },
-    undefined,
-    function (error) {
-      console.error(error)
-    }
-  )
-}
-// 创建刚体，刚体就相当于现实生活中的物体（实体）一样 例如：桌子、板凳、大树、乒乓球等
-const sphereRadius = 0.5 // 半径是半径的一半
-const spherePosition = new CANNON.Vec3(0, sphereRadius, 3)
-const pinBodyY = 1
-const pinBodyPosition = new CANNON.Vec3(0, pinBodyY / 2, -3)
-const initCannon = () => {
-  world = new CANNON.World() //初始化一个CANNON对象
-  // 设置CANNON的引力  相当与地球的引力（您可以x轴也可以设置y轴或者z轴 负数则会向下掉，正数则向上）
-  world.gravity.set(0, -9.82, 0)
-
-  /**
-   * 定义项目需要用到的材质
-   */
-  const concreteMaterial = new CANNON.Material('concrete') //创建混凝土材质
-  const plasticMaterial = new CANNON.Material('plastic') //创建塑料材质
-
-  /**
-   *创建球体刚体
-   */
+/**
+ *创建球体刚体
+ */
+const creatSphereBody = () => {
   sphereBody = new CANNON.Body({
     mass: 10, //质量
     position: spherePosition, //位置
@@ -225,30 +239,80 @@ const initCannon = () => {
     // }
   })
   world.addBody(sphereBody) //向world中添加刚体信息
-
-  /**
-   * 创建瓶体刚体
-   */
+}
+// 创建圆柱
+const initCylinder = () => {
+  // 圆球体
+  const geometry = new CylinderGeometry(pinBodyRadius, pinBodyRadius, pinBodyHeight, 10)
+  const material = new MeshPhongMaterial({
+    color: 0xffff00,
+    specular: 0x7777ff // 高光颜色
+  })
+  sphere = new Mesh(geometry, material)
+  sphere.position.y = pinBodyHeight / 2
+  sphere.castShadow = true //default is false 阴影
+  scene.add(sphere)
+  bowlingPin = sphere
+  creatPinBody()
+  // loadModel('/models/bowlingPin/base.glb', (model) => {
+  //   model.scale.set(0.5, 0.5, 0.5)
+  //   const box = new Box3().setFromObject(model)
+  //   const x = box.max.x - box.min.x
+  //   const y = box.max.y - box.min.y
+  //   const z = box.max.z - box.min.z
+  //   // 这里需要根据模型的初始状态来设置半径和高度，然后设置对应的刚体尺寸和位置
+  //   pinBodyHeight = z
+  //   pinBodyRadius = x / 2
+  pinBodyPosition.y = pinBodyHeight / 2
+  //   model.position.y = z / 2 // 由于几何体要旋转一下，所以取z轴的一半
+  //   model.rotation.x = -Math.PI / 2
+  //   const material = new MeshPhongMaterial({
+  //     color: 0xffffff,
+  //     specular: 0x7777ff // 高光颜色
+  //   })
+  //   model.traverse(function (child) {
+  //     if (child.isMesh) {
+  //       child.castShadow = true
+  //       child.material = material
+  //       // child.rotation.x = -Math.PI / 2
+  //     }
+  //   })
+  //   bowlingPin = model
+  //   creatPinBody()
+  // })
+}
+/**
+ * 创建瓶体刚体
+ */
+const creatPinBody = () => {
   pinBody = new CANNON.Body({
-    mass: 0.1,
+    mass: 0.2,
     position: pinBodyPosition,
-    shape: new CANNON.Cylinder(pinBodyY / 2, pinBodyY / 2, pinBodyY, 10),
+    shape: new CANNON.Cylinder(pinBodyRadius, pinBodyRadius, pinBodyHeight, 10),
     material: plasticMaterial
   })
-  pinBody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1, 0, 0), Math.PI * 0.5)
   world.addBody(pinBody)
-
-  /**
-   * 创建地板刚体
-   */
-  const floorBody = new CANNON.Body()
-  floorBody.mass = 0 //质量  质量为0时表示该物体是一个固定的物体即不可破坏
-  floorBody.addShape(new CANNON.Plane()) //设置刚体的形状为CANNON.Plane 地面形状
-  floorBody.material = concreteMaterial //设置材质
-  // 由于平面初始化是是竖立着的，所以需要将其旋转至跟现实中的地板一样 横着
-  // 在cannon.js中，我们只能使用四元数(Quaternion)来旋转，可以通过setFromAxisAngle(…)方法，第一个参数是旋转轴，第二个参数是角度
-  floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1, 0, 0), Math.PI * 0.5)
-  world.addBody(floorBody)
+}
+// 加载模型
+const loadModel = (glb, callback) => {
+  loader.load(
+    glb,
+    function (gltf) {
+      const model = gltf.scene
+      scene.add(model)
+      callback(model)
+    },
+    undefined,
+    function (error) {
+      console.error(error)
+    }
+  )
+}
+// 创建刚体，刚体就相当于现实生活中的物体（实体）一样 例如：桌子、板凳、大树、乒乓球等
+const initCannon = () => {
+  world = new CANNON.World() //初始化一个CANNON对象
+  // 设置CANNON的引力  相当与地球的引力（您可以x轴也可以设置y轴或者z轴 负数则会向下掉，正数则向上）
+  world.gravity.set(0, -9.82, 0)
 
   /**
    * 设置两种材质相交时的效果  相当于设置两种材质碰撞时应该展示什么样的效果 例如：篮球在地板上反弹
@@ -259,12 +323,12 @@ const initCannon = () => {
     plasticMaterial, //材质2
     {
       friction: 0.1, //摩擦力
-      restitution: 0 //反弹力
+      restitution: 0.7 //反弹力
     }
   )
   const plasticPlasticMaterial = new CANNON.ContactMaterial(
     plasticMaterial, //材质1
-    plasticMaterial, //材质2
+    plasticMaterial, //材质1
     {
       friction: 0.1, //摩擦力
       restitution: 0.7 //反弹力
@@ -273,8 +337,6 @@ const initCannon = () => {
   //添加接触材质配置
   world.addContactMaterial(concretePlasticMaterial)
   world.addContactMaterial(plasticPlasticMaterial)
-  // sphereBody.sleep()
-  // pinBody.sleep()
 }
 
 // 连续渲染
@@ -284,8 +346,9 @@ const animate = () => {
   // world.step(1 / 60) //动态更新world
   // sphere.position.copy(sphereBody.position) //设置threejs中的球体位置
   bowlingBall?.position.copy(sphereBody.position)
-  bowlingPin?.position.copy(pinBody.position)
-  bowlingPin?.quaternion.copy(pinBody.quaternion)
+  bowlingBall?.quaternion.copy(sphereBody.quaternion)
+  pinBody && bowlingPin?.position.copy(pinBody.position)
+  pinBody && bowlingPin?.quaternion.copy(pinBody.quaternion)
   controls.update()
   renderer.render(scene, camera)
 }
@@ -296,7 +359,7 @@ const shoot = () => {
 const reset = () => {
   sphereBody.position.copy(spherePosition)
   pinBody.position.copy(pinBodyPosition)
-  pinBody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1, 0, 0), Math.PI * 0.5)
+  pinBody.quaternion.copy(new CANNON.Quaternion())
   sphereBody.sleep()
   pinBody.sleep()
 }
