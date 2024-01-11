@@ -6,8 +6,10 @@
           >api文档</a
         >
       </div>
+    </div>
+    <div class="btn-wrap">
       <a-button @click="moveLeft">左移</a-button>
-      <a-button @click="shoot">发射</a-button>
+      <a-button type="primary" @click="shoot">发射</a-button>
       <a-button @click="moveRitht">右移</a-button>
       <a-button @click="reset">复位</a-button>
     </div>
@@ -432,7 +434,7 @@ onMounted(() => {
 <style lang="less" scoped>
 .bowling-game-root {
   width: 100%;
-  height: 100%;
+  height: 100vh;
   position: relative;
   canvas {
     width: 100%;
@@ -443,6 +445,12 @@ onMounted(() => {
     left: 0;
     top: 0;
     width: 100%;
+  }
+  .btn-wrap {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, 0);
+    bottom: 0;
   }
 }
 </style>
