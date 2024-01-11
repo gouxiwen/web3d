@@ -6,7 +6,9 @@
           >api文档</a
         >
       </div>
+      <a-button @click="moveLeft">左移</a-button>
       <a-button @click="shoot">发射</a-button>
+      <a-button @click="moveRitht">右移</a-button>
       <a-button @click="reset">复位</a-button>
     </div>
     <canvas id="canvas" ref="canvasRef"></canvas>
@@ -41,13 +43,17 @@ import {
   Color,
   AmbientLight,
   SpotLight,
-  Box3
+  Object3D,
+  Box3,
+  Group
 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 import * as CANNON from 'cannon-es'
 import groundImg from '@/assets/images/ground.jpg'
+import wallImg from '@/assets/images/woman.webp'
+import bowlingbgImg from '@/assets/images/bowlingbg.webp'
 import pinSound from '@/assets/sounds/bowling/pin-1.mp3'
 
 // Draco
@@ -58,7 +64,18 @@ dracoLoader.setDecoderConfig({ type: 'js' })
 const loader = new GLTFLoader()
 loader.setDRACOLoader(dracoLoader)
 
-let scene, renderer, camera, controls, sphere, sphereBody, pinBody, world, bowlingBall, bowlingPin
+let scene,
+  renderer,
+  camera,
+  controls,
+  sphere,
+  sphereBody,
+  pinBody,
+  world,
+  bowlingBall,
+  bowlingPinArray = [],
+  pinBodyArray = [],
+  originalPositionArray = []
 /**
  * 定义项目需要用到的材质
  */
@@ -74,7 +91,7 @@ let pinBodyPosition = new CANNON.Vec3(0, pinBodyHeight / 2, -groundSize.z / 10)
 const initThree = (canvas) => {
   scene = new Scene()
   camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
-  camera.position.set(0, 5, 15)
+  camera.position.set(0, 10, 13)
   camera.lookAt(0, 5, 0)
   renderer = new WebGLRenderer({ antialias: true, canvas })
   // 根据设备像素比决定渲染的像素，贴图不模糊
@@ -99,8 +116,8 @@ const createLight = () => {
   // scene.add(ambientLight) // 将环境光添加到场景
 
   // 灯光
-  const pointLight = new PointLight(0xffffff, 100, 100)
-  pointLight.position.set(0, 7, 1)
+  const pointLight = new PointLight(0xffffff, 200, 100)
+  pointLight.position.set(0, 10, 1)
   pointLight.castShadow = true // default false 阴影
   scene.add(pointLight)
 
@@ -118,7 +135,7 @@ const createLight = () => {
 const initGround = () => {
   let texture = new TextureLoader().load(groundImg)
   texture.wrapS = texture.wrapT = RepeatWrapping
-  texture.repeat.set(1, 4)
+  // texture.repeat.set(1, 4)
   // let geometry = new BoxGeometry(groundSize.x, groundSize.y, groundSize.z)
   let geometry = new PlaneGeometry(groundSize.x, groundSize.z)
   // 需要添加光
@@ -153,9 +170,9 @@ const initGround = () => {
 }
 // 创建墙
 const initWall = () => {
-  let texture = new TextureLoader().load(groundImg)
+  let texture = new TextureLoader().load(wallImg)
   texture.wrapS = texture.wrapT = RepeatWrapping
-  texture.repeat.set(1, 4)
+  // texture.repeat.set(1, 4)
   let geometry = new PlaneGeometry(groundSize.x, 10)
   // 需要添加光
   let material = new MeshPhongMaterial({
@@ -193,6 +210,7 @@ const initSphere = () => {
   // bowlingBall = sphere
   // creatSphereBody()
   loadModel('/models/bowlingBall/base.glb', (model) => {
+    scene.add(model)
     // model.scale.set(0.7, 0.7, 0.7)
     const box = new Box3().setFromObject(model)
     const x = box.max.x - box.min.x
@@ -243,43 +261,68 @@ const creatSphereBody = () => {
 // 创建圆柱
 const initCylinder = () => {
   // 圆球体
-  const geometry = new CylinderGeometry(pinBodyRadius, pinBodyRadius, pinBodyHeight, 10)
-  const material = new MeshPhongMaterial({
-    color: 0xffff00,
-    specular: 0x7777ff // 高光颜色
-  })
-  sphere = new Mesh(geometry, material)
-  sphere.position.y = pinBodyHeight / 2
-  sphere.castShadow = true //default is false 阴影
-  scene.add(sphere)
-  bowlingPin = sphere
-  creatPinBody()
-  // loadModel('/models/bowlingPin/base.glb', (model) => {
-  //   model.scale.set(0.5, 0.5, 0.5)
-  //   const box = new Box3().setFromObject(model)
-  //   const x = box.max.x - box.min.x
-  //   const y = box.max.y - box.min.y
-  //   const z = box.max.z - box.min.z
-  //   // 这里需要根据模型的初始状态来设置半径和高度，然后设置对应的刚体尺寸和位置
-  //   pinBodyHeight = z
-  //   pinBodyRadius = x / 2
-  pinBodyPosition.y = pinBodyHeight / 2
-  //   model.position.y = z / 2 // 由于几何体要旋转一下，所以取z轴的一半
-  //   model.rotation.x = -Math.PI / 2
-  //   const material = new MeshPhongMaterial({
-  //     color: 0xffffff,
-  //     specular: 0x7777ff // 高光颜色
-  //   })
-  //   model.traverse(function (child) {
-  //     if (child.isMesh) {
-  //       child.castShadow = true
-  //       child.material = material
-  //       // child.rotation.x = -Math.PI / 2
-  //     }
-  //   })
-  //   bowlingPin = model
-  //   creatPinBody()
+  // const geometry = new CylinderGeometry(pinBodyRadius, pinBodyRadius, pinBodyHeight, 10)
+  // const material = new MeshPhongMaterial({
+  //   color: 0xffff00,
+  //   specular: 0x7777ff // 高光颜色
   // })
+  // sphere = new Mesh(geometry, material)
+  // sphere.position.y = pinBodyHeight / 2
+  // sphere.castShadow = true //default is false 阴影
+  // scene.add(sphere)
+  // bowlingPin = sphere
+  // creatPinBody()
+  loadModel('/models/bowlingPin/base.glb', (model) => {
+    // model.scale.set(0.5, 0.5, 0.5)
+    const box = new Box3().setFromObject(model)
+    const x = box.max.x - box.min.x
+    // const y = box.max.y - box.min.y
+    const z = box.max.z - box.min.z
+    // 这里需要根据模型的初始状态来设置半径和高度，然后设置对应的刚体尺寸和位置
+    pinBodyHeight = z
+    pinBodyRadius = x / 2
+    pinBodyPosition.y = pinBodyHeight / 2
+    model.position.y = z / 2 // 由于几何体要旋转一下，所以取z轴的一半
+
+    const material = new MeshPhongMaterial({
+      color: 0xffffff,
+      specular: 0x7777ff // 高光颜色
+    })
+    const redMaterial = new MeshPhongMaterial({
+      color: 'red'
+    })
+
+    model.traverse(function (child) {
+      if (child.isMesh) {
+        child.castShadow = true
+        child.material = child.name === 'shadeRed' ? redMaterial : material
+        // 设置相对位置为0，旋转起来才没有问题
+        child.position.set(0, 0, 0)
+        child.rotation.x = -Math.PI / 2
+      }
+    })
+    // bowlingPin = model
+    // scene.add(bowlingPin)
+    // bowlingPin = model
+    // creatPinBody()
+    generatePin(model)
+  })
+}
+// 批量生成瓶子和对应刚体
+const generatePin = (model, widthCount = 5) => {
+  const heightCount = widthCount
+  for (let i = 0; i < heightCount; i++) {
+    pinBodyPosition.z = i - 5
+    for (let j = 0; j < widthCount; j++) {
+      const newModel = model.clone()
+      pinBodyPosition.x = j - widthCount / 2
+      originalPositionArray.push(pinBodyPosition.clone())
+      bowlingPinArray.push(newModel)
+      scene.add(newModel)
+      creatPinBody()
+    }
+    widthCount--
+  }
 }
 /**
  * 创建瓶体刚体
@@ -291,6 +334,7 @@ const creatPinBody = () => {
     shape: new CANNON.Cylinder(pinBodyRadius, pinBodyRadius, pinBodyHeight, 10),
     material: plasticMaterial
   })
+  pinBodyArray.push(pinBody)
   world.addBody(pinBody)
 }
 // 加载模型
@@ -299,7 +343,7 @@ const loadModel = (glb, callback) => {
     glb,
     function (gltf) {
       const model = gltf.scene
-      scene.add(model)
+      // scene.add(model)
       callback(model)
     },
     undefined,
@@ -347,21 +391,33 @@ const animate = () => {
   // sphere.position.copy(sphereBody.position) //设置threejs中的球体位置
   bowlingBall?.position.copy(sphereBody.position)
   bowlingBall?.quaternion.copy(sphereBody.quaternion)
-  pinBody && bowlingPin?.position.copy(pinBody.position)
-  pinBody && bowlingPin?.quaternion.copy(pinBody.quaternion)
+  for (let index = 0; index < pinBodyArray.length; index++) {
+    const pinBody = pinBodyArray[index]
+    pinBody && bowlingPinArray[index]?.position.copy(pinBody.position)
+    pinBody && bowlingPinArray[index]?.quaternion.copy(pinBody.quaternion)
+  }
   controls.update()
   renderer.render(scene, camera)
 }
 
 const shoot = () => {
-  sphereBody.applyForce(new CANNON.Vec3(0, 1000, 0), sphereBody.position)
+  sphereBody.applyForce(new CANNON.Vec3(0, 1000, 0), spherePosition)
+}
+const moveLeft = () => {
+  sphereBody.position.x -= 0.5
+}
+const moveRitht = () => {
+  sphereBody.position.x += 0.5
 }
 const reset = () => {
   sphereBody.position.copy(spherePosition)
-  pinBody.position.copy(pinBodyPosition)
-  pinBody.quaternion.copy(new CANNON.Quaternion())
+  for (let index = 0; index < originalPositionArray.length; index++) {
+    const position = originalPositionArray[index]
+    pinBodyArray[index]?.position.copy(position)
+    pinBodyArray[index]?.quaternion.copy(new CANNON.Quaternion())
+    pinBodyArray[index]?.sleep()
+  }
   sphereBody.sleep()
-  pinBody.sleep()
 }
 const canvasRef = ref(null)
 onMounted(() => {
