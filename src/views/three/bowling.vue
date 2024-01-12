@@ -119,7 +119,7 @@ const createLight = () => {
 
   // 灯光
   const pointLight = new PointLight(0xffffff, 200, 100)
-  pointLight.position.set(0, 10, 1)
+  pointLight.position.set(0, 8, 1)
   pointLight.castShadow = true // default false 阴影
   scene.add(pointLight)
 

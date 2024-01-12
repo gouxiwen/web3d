@@ -228,17 +228,17 @@ export const routes = [
       },
       {
         path: 'tree1',
-        name: 'tree1',
+        name: '自转公转',
         component: () => import('@/views/three/tree1.vue')
       },
       {
         path: 'tree2',
-        name: 'tree2',
+        name: '大炮',
         component: () => import('@/views/three/tree2.vue')
       },
       {
         path: 'machineRoom',
-        name: 'machineRoom',
+        name: '机房',
         component: () => import('@/views/three/machineRoom.vue')
       },
       {
@@ -248,7 +248,7 @@ export const routes = [
       },
       {
         path: 'bowling',
-        name: 'bowling',
+        name: '保龄球',
         component: () => import('@/views/three/bowling.vue')
       },
       {
@@ -258,8 +258,13 @@ export const routes = [
       },
       {
         path: 'road',
-        name: 'road',
+        name: '车上路',
         component: () => import('@/views/three/road.vue')
+      },
+      {
+        path: 'animation',
+        name: '动画+变形',
+        component: () => import('@/views/three/animation.vue')
       }
     ]
   },
