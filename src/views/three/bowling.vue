@@ -8,12 +8,18 @@
       </div>
     </div>
     <div class="btn-wrap">
-      <a-button @click="moveLeft">左移</a-button>
-      <a-button type="primary" @click="shoot">发射</a-button>
-      <a-button @click="moveRitht">右移</a-button>
-      <a-button @click="reset">复位</a-button>
+      <!-- <a-button @click="moveLeft">左移</a-button> -->
+      <!-- <a-button type="primary" @click="shoot">发射</a-button> -->
+      <!-- <a-button @click="moveRitht">右移</a-button> -->
+      <a-button type="primary" @click="reset">复位</a-button>
     </div>
-    <canvas id="canvas" ref="canvasRef"></canvas>
+    <canvas
+      id="canvas"
+      ref="canvasRef"
+      @mousedown="hanleMouseDown"
+      @mouseup="hanleMouseUp"
+      @mousemove="hanleMouseMove"
+    ></canvas>
   </div>
 </template>
 
@@ -90,10 +96,14 @@ let spherePosition = new CANNON.Vec3(0, sphereRadius, 3)
 let pinBodyHeight = 1
 let pinBodyRadius = 0.2
 let pinBodyPosition = new CANNON.Vec3(0, pinBodyHeight / 2, -groundSize.z / 10)
+// 鼠标选择
+const raycaster = new Raycaster()
+const pointer = new Vector2()
+
 const initThree = (canvas) => {
   scene = new Scene()
   camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
-  camera.position.set(0, 10, 13)
+  camera.position.set(0, 10, 18)
   camera.lookAt(0, 5, 0)
   renderer = new WebGLRenderer({ antialias: true, canvas })
   // 根据设备像素比决定渲染的像素，贴图不模糊
@@ -101,8 +111,8 @@ const initThree = (canvas) => {
   renderer.setSize(clientWidth * devicePixelRatio, clientHeight * devicePixelRatio, false)
   renderer.shadowMap.enabled = true
   renderer.setClearColor(0xbfd1e5)
-  controls = new OrbitControls(camera, renderer.domElement)
-  controls.update()
+  // controls = new OrbitControls(camera, renderer.domElement)
+  // controls.update()
   createLight()
   initCannon()
   initGround()
@@ -148,6 +158,7 @@ const initGround = () => {
   mesh.rotation.x = -Math.PI / 2
   // mesh.position.y = -0.1
   mesh.receiveShadow = true
+  mesh.name = 'ground'
   scene.add(mesh)
   // let groundGeom = new BoxGeometry(40, 0.2, 40)
   // let groundMate = new MeshPhongMaterial({
@@ -398,7 +409,7 @@ const animate = () => {
     pinBody && bowlingPinArray[index]?.position.copy(pinBody.position)
     pinBody && bowlingPinArray[index]?.quaternion.copy(pinBody.quaternion)
   }
-  controls.update()
+  // controls.update()
   renderer.render(scene, camera)
 }
 
@@ -420,6 +431,60 @@ const reset = () => {
     pinBodyArray[index]?.sleep()
   }
   sphereBody.sleep()
+}
+let bowling = null
+let mousedown = false
+const hanleMouseDown = () => {
+  mousedown = true
+  if (bowling) {
+    canvas.style.cursor = 'grabbing'
+  }
+}
+const hanleMouseUp = () => {
+  mousedown = false
+  canvas.style.cursor = 'default'
+  if (bowling) {
+    shoot()
+  }
+}
+const hanleMouseMove = ({ clientX, clientY }) => {
+  // 消除左侧边栏的影响
+  const [x, y] = [clientX - canvas.getBoundingClientRect().left, clientY]
+  // 将鼠标位置归一化为设备坐标。x 和 y 方向的取值范围是 (-1 to +1)
+  const { width, height } = renderer.domElement
+  pointer.set((x / width) * 2 - 1, -(y / height) * 2 + 1)
+  // 基于鼠标点的裁剪坐标位和相机设置射线投射器
+  raycaster.setFromCamera(pointer, camera)
+  // 存放地板与鼠标的交点
+  const groundPoint = new Vector3()
+  // 计算射线和物体的交点
+  const intersects = raycaster.intersectObjects(scene.children)
+  let selected = false
+  for (let index = 0; index < intersects.length; index++) {
+    const inter = intersects[index]
+    if (inter.object.name === 'shadePurple001') {
+      selected = true
+      bowling = inter
+      canvas.style.cursor = 'grab'
+    } else if (inter.object.name === 'ground') {
+      groundPoint.copy(inter.point)
+    }
+  }
+  if (selected) {
+    // bowling.object.material.color.set(0xffffff)
+    if (mousedown) {
+      // sphereBody.position = new CANNON.Vec3(
+      //   groundPoint.x,
+      //   sphereRadius,
+      //   groundPoint.z + sphereRadius
+      // )
+      sphereBody.position.x = groundPoint.x
+    }
+  } else {
+    // bowling?.object.material.color.set(0xffff00)
+    bowling = null
+    canvas.style.cursor = 'default'
+  }
 }
 const canvasRef = ref(null)
 onMounted(() => {
