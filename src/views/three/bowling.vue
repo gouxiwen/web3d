@@ -54,10 +54,10 @@ import {
   Object3D,
   Box3,
   Group
-} from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
-import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
+} from '../../../lib/three155'
+import { OrbitControls } from '../../../lib/three155/examples/jsm/controls/OrbitControls'
+import { GLTFLoader } from '../../../lib/three155/examples/jsm/loaders/GLTFLoader.js'
+import { DRACOLoader } from '../../../lib/three155/examples/jsm/loaders/DRACOLoader.js'
 import * as CANNON from 'cannon-es'
 import groundImg from '@/assets/images/ground.jpg'
 import wallImg from '@/assets/images/woman.webp'

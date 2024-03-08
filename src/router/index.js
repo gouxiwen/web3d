@@ -265,6 +265,11 @@ export const routes = [
         path: 'animation',
         name: '动画+变形',
         component: () => import('@/views/three/animation.vue')
+      },
+      {
+        path: 'heijingDemo',
+        name: '黑镜demo',
+        component: () => import('@/views/three/heijingDemo.vue')
       }
     ]
   },

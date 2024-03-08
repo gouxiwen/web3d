@@ -15,11 +15,11 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
-import * as THREE from 'three'
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
-import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import { GUI } from 'three/addons/libs/lil-gui.module.min.js'
+import * as THREE from '../../../lib/three155'
+import { GLTFLoader } from '../../../lib/three155/examples/jsm/loaders/GLTFLoader.js'
+import { DRACOLoader } from '../../../lib/three155/examples/jsm/loaders/DRACOLoader.js'
+import { OrbitControls } from '../../../lib/three155/examples/jsm/controls/OrbitControls'
+import { GUI } from '../../../lib/three155/examples/jsm/libs/lil-gui.module.min.js'
 
 const gui = new GUI()
 // Draco
