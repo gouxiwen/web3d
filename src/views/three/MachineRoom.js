@@ -100,7 +100,7 @@ export default class MachineRoom {
   selectCabinet(x, y) {
     const { cabinets, renderer, camera, maps, curCabinet } = this
     const { width, height } = renderer.domElement
-    // 鼠标的canvas坐标转裁剪坐标，屏幕坐标转webgl世界坐标
+    // 鼠标的canvas坐标转裁剪坐标，屏幕坐标转设备坐标，x 和 y 方向的取值范围是 (-1 to +1)
     pointer.set((x / width) * 2 - 1, -(y / height) * 2 + 1)
     // 基于鼠标点的裁剪坐标位和相机设置射线投射器
     raycaster.setFromCamera(pointer, camera)

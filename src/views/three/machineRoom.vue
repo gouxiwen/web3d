@@ -47,7 +47,7 @@ const state = ref({
 
 // 鼠标移动事件
 const mouseMove = ({ clientX, clientY }) => {
-  room.selectCabinet(clientX - canvas.getBoundingClientRect().left, clientY)
+  room.selectCabinet(clientX - canvasRef.value?.getBoundingClientRect().left, clientY)
 }
 
 onMounted(() => {

@@ -270,6 +270,11 @@ export const routes = [
         path: 'heijingDemo',
         name: '黑镜demo',
         component: () => import('@/views/three/heijingDemo.vue')
+      },
+      {
+        path: 'projection',
+        name: '投影点计算',
+        component: () => import('@/views/three/projection.vue')
       }
     ]
   },
