@@ -90,11 +90,26 @@ onMounted(() => {
   const matrix4 = new Matrix4()
   !(function ani() {
     angle += 0.02
-    const [sinB, cosB] = [Math.sin(angle), Math.cos(angle)]
+    // const [sinB, cosB] = [Math.sin(angle), Math.cos(angle)]
     // 以下均为列矩阵
     // 二维矩阵-z轴旋转
     // const matrix = [cosB, sinB, -sinB, cosB]
     // gl.uniformMatrix2fv(u_Matrix, false, matrix)
+    // 3d图形学中的图像变换为什么都用四维矩阵？因为三维矩阵实现不了平移
+    // 四维矩阵-x轴旋转
+    // const matrix = [
+    // 1.0, 0.0, 0.0, 0.0,
+    // 0, cosB, sinB, 0.0,
+    // 0.0, -sinB, cosB, 0.0,
+    // 0.0, 0.0, 0.0, 1.0
+    // ]
+    // 四维矩阵-y轴旋转
+    // const matrix = [
+    // cosB, 0.0, -sinB, 0.0,
+    // 0.0, 1, 0.0, 0.0,
+    // sinB, 0.0, cosB, 0.0,
+    // 0.0, 0.0, 0.0, 1.0
+    // ]
     // 四维矩阵-z轴旋转
     // const matrix = [
     // cosB, sinB, 0.0, 0.0,
