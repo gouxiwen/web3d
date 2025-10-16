@@ -3,13 +3,14 @@
     <canvas id="canvas" ref="canvasRef"></canvas>
     <a-button class="btn" @click="handleExportProjection">导出投影坐标</a-button>
     <div class="map-img">
-      <img :src="mockData.enhanceMapUrl" class="img" />
+      <img :src="projectionData.img2d" class="img" />
       <div
         v-for="(point, index) in projectionData.mapPoint"
         :key="index"
         class="point"
         :style="{ left: point.px + 'px', top: point.py + 'px' }"
       >
+        <div class="dot"></div>
         {{ point.pointName }}
       </div>
     </div>
@@ -158,7 +159,11 @@ const mockData = {
 }
 const canvasRef = ref(null)
 let camera, scene, renderer, controls
+const planGroup = new THREE.Group()
+const pointGroup = new THREE.Group()
 const scale = 100
+// 将平面坐标转换为三维坐标，此处地图及其中的点需相同的转换方法才能保证渲染处理位置正确
+// 由于mockData中的像素数很大，放在three.js中会超出渲染范围，因此需要缩小因子scale，保证在渲染范围之内，缩小因子和相机的fov值及相机的位子共同影响渲染效果
 const transformCood = (x, y) => {
   return [(x - mockData.width / 2) / scale, -(y - mockData.height / 2) / scale]
 }
@@ -175,15 +180,15 @@ const initThree = (canvas) => {
   })
   const plane = new THREE.Mesh(geometry, material)
   plane.position.set(0, 0, 0)
-  scene.add(plane)
+  planGroup.add(plane)
 
   mockData.mapPoint.forEach((item) => {
     const { pixelX: x, pixelY: y } = item
-    const geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1)
+    const geometry = new THREE.BoxGeometry(10 / scale, 10 / scale, 10 / scale)
     const material = new THREE.MeshBasicMaterial({ color: 0x00ffff })
     const cube = new THREE.Mesh(geometry, material)
     cube.position.set(...transformCood(x, y), 0)
-    scene.add(cube)
+    pointGroup.add(cube)
     // text
     // const loaderFont = new FontLoader()
     // loaderFont.load('/fonts/helvetiker_bold.typeface.json', (font) => {
@@ -211,10 +216,14 @@ const initThree = (canvas) => {
     // })
 
     // plan中的世界坐标
-    item.vector = new THREE.Vector3(...transformCood(x, y), 0)
+    item.vector3d = new THREE.Vector3(...transformCood(x, y), 0)
   })
+  //   planGroup.rotation.x = -Math.PI / 4 // 自身旋转不影响导出的二维坐标
+  planGroup.add(pointGroup)
+  scene.add(planGroup)
+  // 相机的fov值及相机的位子共同影响渲染效果，这里要保证plan的宽度正好等于渲染容器的宽度，才能保证导出的二维坐标比例正确
   camera = new THREE.PerspectiveCamera(75, canvas.offsetWidth / canvas.offsetHeight, 0.1, 1000)
-  camera.position.set(1, -5, 10)
+  camera.position.set(0, -5, 5)
   camera.lookAt(0, 0, 0)
   renderer = new THREE.WebGLRenderer({ canvas, antialias: true })
   const { clientWidth, clientHeight } = renderer.domElement
@@ -234,15 +243,21 @@ const animate = () => {
 
 const projectionData = ref({ ...mockData })
 const handleExportProjection = () => {
+  const { clientWidth, clientHeight } = renderer.domElement
   projectionData.value.mapPoint = mockData.mapPoint.map((item) => {
-    const vector = item.vector.clone().project(camera) //通过世界坐标获取转标准设备坐标
-    const w = mockData.width / 2
-    const h = mockData.height / 2
-    const x = Math.round(vector.x * w + w) //标准设备坐标转屏幕(投影)坐标
-    const y = Math.round(-vector.y * h + h)
+    const vector2d = item.vector3d.clone().project(camera) //通过世界坐标获取转标准设备坐标，3D转2D
+    const w = clientWidth / 2
+    const h = clientHeight / 2
+    const x = Math.round(vector2d.x * w + w) //标准设备坐标转屏幕(投影)坐标
+    const y = Math.round(-vector2d.y * h + h)
     return { ...item, px: x, py: y }
   })
-  console.log(projectionData)
+
+  //   截图
+  // three.js 出于性能方面的考虑，默认将preserveDrawingBuffer选项（是否保留缓（存）直到手动清除或被覆盖）设置为false，说明打开这个选项会造成较大的性能开销。
+  // 既然three.js会一直清除缓存，那我在截图前，让它重新画一次不就行了？
+  renderer.render(scene, camera) //关键代码
+  projectionData.value.img2d = renderer.domElement.toDataURL('image/png')
 }
 onMounted(() => {
   const { value: canvas } = canvasRef
@@ -250,7 +265,7 @@ onMounted(() => {
     return
   }
   initThree(canvas)
-  handleExportProjection()
+  setTimeout(handleExportProjection, 0)
 })
 </script>
 
@@ -268,24 +283,35 @@ onMounted(() => {
     top: 20px;
     right: 20px;
   }
+  //   点位定位容器尺寸必需和three.js渲染容器尺寸一致，否则导出的二维坐标比例会不正确
   .map-img {
     position: absolute;
     top: 0px;
     left: 0px;
-    width: 995px;
-    height: 570px;
-    transform: scale(0.5) translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    transform: scale(0.3) translate(-116%, -116%);
+    display: flex;
+    align-items: center;
+    overflow: hidden;
     .img {
+      border: 1px solid #fff;
       width: 100%;
-      height: 100%;
     }
     .point {
       position: absolute;
-      width: 30px;
-      height: 30px;
-      background-color: red;
-      border-radius: 50%;
       transform: translate(-50%, -50%);
+      font-size: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #000;
+      .dot {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: red;
+      }
     }
   }
 }
