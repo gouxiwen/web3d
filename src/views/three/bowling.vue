@@ -64,9 +64,10 @@ import wallImg from '@/assets/images/woman.webp'
 import bowlingbgImg from '@/assets/images/bowlingbg.webp'
 import pinSound from '@/assets/sounds/bowling/pin-1.mp3'
 
-// Draco
+// Draco 模型经过压缩，需要解压，
+// 解压文件在three.js的包里node_modules/three/examples/jsm/libs/draco/gltf，可以复制一份出来
 const dracoLoader = new DRACOLoader()
-dracoLoader.setDecoderPath('/draco/')
+dracoLoader.setDecoderPath('/draco/gltf/')
 dracoLoader.setDecoderConfig({ type: 'js' })
 // gltf
 const loader = new GLTFLoader()
